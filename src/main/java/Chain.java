@@ -9,6 +9,7 @@ public class Chain {
     public static final double MIN_AMOUNT = 0.1;
 
     private Chain() {
+        this.blocks = new ArrayList<Block>();
     }
 
     public static Chain getInstance() {
@@ -16,5 +17,13 @@ public class Chain {
             chain = new Chain();
         }
         return chain;
+    }
+
+    public void addBlock(Block block) {
+        this.blocks.add(block);
+    }
+
+    public ArrayList<Block> getBlocks() {
+        return this.blocks;
     }
 }

@@ -15,7 +15,8 @@ public class Block {
         this.transactions = transactions;
         this.timestamp = new Timestamp(System.currentTimeMillis());
         this.nonce = nonce;
-        this.merkleRootHash = getMerkleRoot();
+        if(this.transactions.size() > 0)
+            this.merkleRootHash = getMerkleRoot();
         this.hash = Tools.applyHash(this.previousHash + this.merkleRootHash + this.timestamp + this.nonce);
     }
 
