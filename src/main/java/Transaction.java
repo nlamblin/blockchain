@@ -5,6 +5,7 @@ public class Transaction {
 
     public Transaction(String data) {
         this.data = data;
+        this.hash = Tools.applyHash(this.data);
     }
 
     public String getData() {
@@ -13,5 +14,13 @@ public class Transaction {
 
     public void setData(String data) {
         this.data = data;
+    }
+
+    public String getHash() {
+        return this.hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
     }
 }
