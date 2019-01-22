@@ -10,17 +10,17 @@ public class Block {
     private Timestamp timestamp;
     private long nonce;
 
-    public Block(String previousHash, ArrayList<Transaction> transactions, long nonce) {
+    public Block(String previousHash) {
         this.previousHash = previousHash;
-        this.transactions = transactions;
+        this.transactions = new ArrayList<Transaction>();
         this.timestamp = new Timestamp(System.currentTimeMillis());
-        this.nonce = nonce;
-        if(this.transactions.size() > 0)
-            this.merkleRootHash = getMerkleRoot();
+    }
+
+    public void generateHash() {
         this.hash = Tools.applyHash(this.previousHash + this.merkleRootHash + this.timestamp + this.nonce);
     }
 
-    private String getMerkleRoot() {
+    public void getMerkleRoot() {
         int countNodesLeft = this.transactions.size();
         ArrayList<String> previousLayer = new ArrayList<String>();
         for(Transaction t : this.transactions) {
@@ -36,7 +36,7 @@ public class Block {
             countNodesLeft = layer.size();
             previousLayer = layer;
         }
-        return layer.get(0); // merkle root hash
+        this.merkleRootHash = layer.get(0); // merkle root hash
     }
 
     public void addTransaction(Transaction transaction) {
