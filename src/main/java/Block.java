@@ -1,9 +1,7 @@
-import com.sun.jmx.snmp.SnmpStatusException;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
-public class Bloc {
+public class Block {
 
     private String hash;
     private String previousHash;
@@ -12,7 +10,7 @@ public class Bloc {
     private Timestamp timestamp;
     private long nonce;
 
-    public Bloc(String previousHash, ArrayList<Transaction> transactions, long nonce) {
+    public Block(String previousHash, ArrayList<Transaction> transactions, long nonce) {
         this.previousHash = previousHash;
         this.transactions = transactions;
         this.timestamp = new Timestamp(System.currentTimeMillis());
