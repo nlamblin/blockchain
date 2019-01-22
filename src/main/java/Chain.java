@@ -23,6 +23,18 @@ public class Chain {
         this.blocks.add(block);
     }
 
+    public boolean isCorrect() {
+        boolean result = true;
+        int i = 1;
+        System.out.println(blocks.size());
+        while(i < this.blocks.size() || !result) {
+            if (!this.blocks.get(i).getPreviousHash().equals(this.blocks.get(i-1).getHash()))
+                result = false;
+            i++;
+        }
+        return result;
+    }
+
     public ArrayList<Block> getBlocks() {
         return this.blocks;
     }
