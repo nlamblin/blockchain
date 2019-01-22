@@ -19,8 +19,4 @@ class Tools {
             throw new RuntimeException(e);
         }
     }
-
-    static String generateHash(String data) {
-        return applyHash(data);
-    }
 }
