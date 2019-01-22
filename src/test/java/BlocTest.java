@@ -34,4 +34,16 @@ public class BlocTest {
         Bloc b = new Bloc("77685afb04ce2a8b334464fa0508ebcc97b8a75695a97fede1794453906f1245", transactions, 10388575);
         assertEquals(b.getMerkleRootHash(), "2be3700f862f4052d5819a2c5c2cb8c5c82840ed75741084d457311b2f7d8a8c");
     }
+
+    @Test
+    public void TestAddTransaction() {
+        ArrayList<Transaction> transactions = new ArrayList<Transaction>();
+        transactions.add(new Transaction("Transaction1"));
+        transactions.add(new Transaction("Transaction2"));
+        Bloc b = new Bloc("77685afb04ce2a8b334464fa0508ebcc97b8a75695a97fede1794453906f1245", transactions, 10388575);
+        int initialSize = b.getTransactions().size();
+
+        b.addTransaction(new Transaction("Transaction3"));
+        assertEquals(initialSize+1, b.getTransactions().size());
+    }
 }

@@ -40,6 +40,10 @@ public class Bloc {
         return layer.get(0); // merkle root hash
     }
 
+    public void addTransaction(Transaction transaction) {
+        this.transactions.add(transaction);
+    }
+
     public String getHash() {
         return hash;
     }
