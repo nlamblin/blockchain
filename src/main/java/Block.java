@@ -30,7 +30,6 @@ public class Block {
         while(countNodesLeft > 1) {
             layer = new ArrayList<String>();
             for(int i = 1; i < previousLayer.size(); i = i+2) {
-                // System.out.println(previousLayer.get(i-1) + " + " + previousLayer.get(i) + " = " + Tools.applyHash(previousLayer.get(i-1) + previousLayer.get(i)));
                 layer.add(Tools.applyHash(previousLayer.get(i-1) + previousLayer.get(i)));
             }
             countNodesLeft = layer.size();

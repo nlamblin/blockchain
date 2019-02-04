@@ -4,12 +4,14 @@ public class Chain {
 
     private static Chain chain = null;
     private ArrayList<Block> blocks;
+    public ArrayList<Transaction> transactionsNotYetValidated;
     public static final long DIFFICULTY = 0;
-    public static final int BLOCK_SIZE = 0;
+    public static final int BLOCK_SIZE = 16;
     public static final double MIN_AMOUNT = 0.1;
 
     private Chain() {
         this.blocks = new ArrayList<Block>();
+        this.transactionsNotYetValidated = new ArrayList<Transaction>();
     }
 
     public static Chain getInstance() {

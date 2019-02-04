@@ -1,19 +1,29 @@
+import java.sql.Timestamp;
+
 public class Transaction {
 
-    private String data;
+    private double amount;
     private String hash;
+    private Timestamp timestamp;
+    private String senderId;
+    private String receiverId;
 
-    public Transaction(String data) {
-        this.data = data;
-        this.hash = Tools.applyHash(this.data);
+    public Transaction(double amount, String senderId, String receiverId) {
+        this.amount = amount;
+        this.senderId = senderId;
+        this.receiverId = receiverId;
+        this.timestamp = new Timestamp(System.currentTimeMillis());
+        generateHash();
     }
 
-    public String getData() {
-        return this.data;
+    public void generateHash() {
+        this.hash = Tools.applyHash(this.amount + this.senderId + this.receiverId + this.timestamp);
     }
 
-    public void setData(String data) {
-        this.data = data;
+    public double getAmount() { return this.amount; }
+
+    public void setAmount(float amount) {
+        this.amount = amount;
     }
 
     public String getHash() {
@@ -23,4 +33,16 @@ public class Transaction {
     public void setHash(String hash) {
         this.hash = hash;
     }
+
+    public Timestamp getTimestamp() { return timestamp; }
+
+    public void setTimestamp(Timestamp timestamp) { this.timestamp = timestamp; }
+
+    public String getSender() { return senderId; }
+
+    public void setSenderId(String sender) { this.senderId = senderId; }
+
+    public String getReceiver() { return receiverId; }
+
+    public void setReceiverId(String receiverId) { this.receiverId = receiverId; }
 }
