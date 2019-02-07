@@ -4,14 +4,14 @@ public class Chain {
 
     private static Chain chain = null;
     private ArrayList<Block> blocks;
-    public ArrayList<Transaction> transactionsNotYetValidated;
-    public static final long DIFFICULTY = 0;
-    public static final int BLOCK_SIZE = 16;
+    public ArrayList<Transaction> transactionsPool;
+    public static final int DIFFICULTY = 3;
+    public static final int BLOCK_SIZE = 4;
     public static final double MIN_AMOUNT = 0.1;
 
     private Chain() {
         this.blocks = new ArrayList<Block>();
-        this.transactionsNotYetValidated = new ArrayList<Transaction>();
+        this.transactionsPool = new ArrayList<Transaction>();
     }
 
     public static Chain getInstance() {
@@ -25,19 +25,20 @@ public class Chain {
         this.blocks.add(block);
     }
 
-    public boolean isCorrect() {
-        boolean result = true;
-        int i = 1;
-        System.out.println(blocks.size());
-        while(i < this.blocks.size() || !result) {
-            if (!this.blocks.get(i).getPreviousHash().equals(this.blocks.get(i-1).getHash()))
-                result = false;
-            i++;
-        }
-        return result;
-    }
-
     public ArrayList<Block> getBlocks() {
         return this.blocks;
+    }
+
+    public ArrayList<Transaction> getTransactionsPool() {
+        return this.transactionsPool;
+    }
+
+    public String toString() {
+        String chainString = "";
+        for(Block block : blocks) {
+            chainString += "Block n°: " + blocks.indexOf(block) + "\n" +
+                            block.toString() + "\n\n\n";
+        }
+        return chainString;
     }
 }

@@ -12,7 +12,6 @@ public class BlockTest {
         Block b = new Block(previousHash);
 
         assertEquals(b.getPreviousHash(), previousHash);
-        assertNotNull(b.getTimestamp());
     }
 
     @Test
@@ -20,6 +19,7 @@ public class BlockTest {
         Trader trader1 = new Trader("abc100", "trader1", 20);
         Trader trader2 = new Trader("def200", "trader2", 40);
         Trader trader3 = new Trader("ghi300", "trader3", 12);
+        Miner miner = new Miner("miner", 1);
 
         Transaction transaction1 = new Transaction(1.1, trader1.getId(), trader2.getId());
         transaction1.setTimestamp(new Timestamp(1549299372));
@@ -37,27 +37,12 @@ public class BlockTest {
         transaction4.setTimestamp(new Timestamp(1549299497));
         transaction4.generateHash();
 
-        Block b = new Block("####");
-        b.addTransaction(transaction1);
-        b.addTransaction(transaction2);
-        b.addTransaction(transaction3);
-        b.addTransaction(transaction4);
-        b.getMerkleRoot();
-        assertEquals("979c6cf44f6ffd172542c45625766842a9345b036da54b7e575f1313cd220411", b.getMerkleRootHash());
-    }
-
-    @Test
-    public void TestAddTransaction() {
-        Trader trader1 = new Trader("trader1", 10);
-        Trader trader2 = new Trader("trader2", 20);
-
-        System.out.println(trader1.toString());
-
-        Transaction transaction1 = new Transaction(2, trader1.getId(), trader2.getId());
-
-        Block b = new Block("77685afb04ce2a8b334464fa0508ebcc97b8a75695a97fede1794453906f1245");
-        int initialSize = b.getTransactions().size();
-        b.addTransaction(transaction1);
-        assertEquals(initialSize+1, b.getTransactions().size());
+        miner.createBlock("####");
+        miner.addTransaction(transaction1);
+        miner.addTransaction(transaction2);
+        miner.addTransaction(transaction3);
+        miner.addTransaction(transaction4);
+        miner.getCurrentBlock().createMerkleTree();
+        assertEquals("979c6cf44f6ffd172542c45625766842a9345b036da54b7e575f1313cd220411", miner.getCurrentBlock().getMerkleRootHash());
     }
 }

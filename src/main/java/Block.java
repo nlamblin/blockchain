@@ -8,19 +8,18 @@ public class Block {
     private String merkleRootHash;
     private ArrayList<Transaction> transactions;
     private Timestamp timestamp;
-    private long nonce;
+    private int nonce;
 
     public Block(String previousHash) {
         this.previousHash = previousHash;
         this.transactions = new ArrayList<Transaction>();
-        this.timestamp = new Timestamp(System.currentTimeMillis());
     }
 
-    public void generateHash() {
-        this.hash = Tools.applyHash(this.previousHash + this.merkleRootHash + this.timestamp + this.nonce);
+    public String generateHash() {
+        return Tools.applyHash(this.previousHash + this.merkleRootHash + this.timestamp + this.nonce);
     }
 
-    public void getMerkleRoot() {
+    public void createMerkleTree() {
         int countNodesLeft = this.transactions.size();
         ArrayList<String> previousLayer = new ArrayList<String>();
         for(Transaction t : this.transactions) {
@@ -36,10 +35,6 @@ public class Block {
             previousLayer = layer;
         }
         this.merkleRootHash = layer.get(0); // merkle root hash
-    }
-
-    public void addTransaction(Transaction transaction) {
-        this.transactions.add(transaction);
     }
 
     public String getHash() {
@@ -82,11 +77,25 @@ public class Block {
         this.timestamp = timestamp;
     }
 
-    public long getNonce() {
+    public int getNonce() {
         return nonce;
     }
 
-    public void setNonce(long nonce) {
+    public void setNonce(int nonce) {
         this.nonce = nonce;
+    }
+
+    public String toString() {
+        String transactionsString = "";
+        for(Transaction transaction : this.transactions) {
+            transactionsString += transaction.toString() + "\n";
+        }
+
+        return "\t Hash : " + this.hash + "\n" +
+                "\t Previous hash : " + this.previousHash + "\n" +
+                "\t Merkle root hash : " + this.merkleRootHash + "\n" +
+                "\t Timestamp : " + this.timestamp + "\n" +
+                "\t Nonce : " + this.nonce + "\n" +
+                "\t Transactions : \n" + transactionsString;
     }
 }

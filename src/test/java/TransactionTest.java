@@ -1,7 +1,5 @@
 import org.junit.Test;
 
-import java.util.Base64;
-
 import static org.junit.Assert.*;
 
 public class TransactionTest {
@@ -18,6 +16,7 @@ public class TransactionTest {
         assertEquals(t.getSender(), trader1.getId());
         assertEquals(t.getReceiver(), trader2.getId());
         assertNotNull(t.getTimestamp());
+        assertFalse(t.getAlreadyValidate());
     }
 
     @Test
@@ -25,5 +24,12 @@ public class TransactionTest {
         Transaction t = new Transaction(10, new Trader("trader1", 50).getId(), new Trader("trader2", 140).getId());
         t.generateHash();
         assertNotNull(t.getHash());
+    }
+
+    @Test
+    public void TestAlreadyValidateTrue() {
+        Transaction t = new Transaction(10, new Trader("trader1", 50).getId(), new Trader("trader2", 140).getId());
+        t.setAlreadyValidate();
+        assertTrue(t.getAlreadyValidate());
     }
 }
