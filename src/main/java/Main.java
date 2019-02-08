@@ -16,19 +16,16 @@ public class Main {
         trader2.sendMoney(trader1.getId(), 0.5);
         trader1.sendMoney(trader3.getId(), 1);
         trader3.sendMoney(trader2.getId(), 1.2);
-        miner.fullProcess("###");
 
         trader1.sendMoney(trader2.getId(), 2.8);
         trader2.sendMoney(trader1.getId(), 0.4);
         trader1.sendMoney(trader3.getId(), 1.9);
         trader3.sendMoney(trader2.getId(), 1.3);
-        miner.fullProcess(miner.getCurrentBlock().getHash());
 
         trader1.sendMoney(trader2.getId(), 4.6);
         trader2.sendMoney(trader1.getId(), 0.7);
         trader1.sendMoney(trader3.getId(), 2.1);
         trader3.sendMoney(trader2.getId(), 2.2);
-        miner.fullProcess(miner.getCurrentBlock().getHash());
 
         miner.chainIsValid();
 

@@ -10,7 +10,7 @@ public class Trader extends User {
 
     public void sendMoney(String receiver, double amount) {
         Transaction transaction = new Transaction(amount, this.id, receiver);
-        Chain.getInstance().transactionsPool.add(transaction);
+        Chain.getInstance().putNewTransaction(transaction);
     }
 
 }

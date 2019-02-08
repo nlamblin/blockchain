@@ -1,17 +1,16 @@
 import java.util.ArrayList;
+import java.util.Map;
 
 public class Chain {
 
     private static Chain chain = null;
     private ArrayList<Block> blocks;
-    public ArrayList<Transaction> transactionsPool;
     public static final int DIFFICULTY = 3;
     public static final int BLOCK_SIZE = 4;
     public static final double MIN_AMOUNT = 0.1;
 
     private Chain() {
         this.blocks = new ArrayList<Block>();
-        this.transactionsPool = new ArrayList<Transaction>();
     }
 
     public static Chain getInstance() {
@@ -29,16 +28,19 @@ public class Chain {
         return this.blocks;
     }
 
-    public ArrayList<Transaction> getTransactionsPool() {
-        return this.transactionsPool;
-    }
-
     public String toString() {
         String chainString = "";
         for(Block block : blocks) {
             chainString += "Block n°: " + blocks.indexOf(block) + "\n" +
-                            block.toString() + "\n\n\n";
+                            block.toString() + "\n\n";
         }
         return chainString;
     }
+
+    public void putNewTransaction(Transaction transaction) {
+        for(Map.Entry<String, Miner> entry : Main.miners.entrySet()) {
+            entry.getValue().notify(transaction);
+        }
+    }
+
 }

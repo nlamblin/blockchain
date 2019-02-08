@@ -5,43 +5,40 @@ import java.util.Random;
 public class Miner extends User {
 
     public Block currentBlock;
+    private ArrayList<Transaction> newTransactions;
 
     public Miner(String name, float balance) {
         super(name, balance);
+        this.newTransactions = new ArrayList<>();
     }
 
     public Miner(String id, String name, float balance) {
         super(id, name, balance);
+        this.newTransactions = new ArrayList<>();
     }
 
-    public void fullProcess(String previousHash) {
+    public void miningProcess() {
+        String previousHash = (Chain.getInstance().getBlocks().isEmpty()) ? "####" : Chain.getInstance().getBlocks().get(Chain.getInstance().getBlocks().size()-1).getHash();
         this.createBlock(previousHash);
-        ArrayList<Transaction> transactions = this.findTransactions();
-        this.addTransactionToBlock(transactions);
+        ArrayList<Transaction> validatedTransactions = this.validatedTransactions();
+        this.addTransactionToBlock(validatedTransactions);
         this.mine();
+        this.newTransactions.clear();
     }
 
     public void createBlock(String previousHash) {
         this.currentBlock = new Block(previousHash);
     }
 
-    public ArrayList<Transaction> findTransactions() {
-        ArrayList<Transaction> transationsToValidate = new ArrayList<>();
-        Random random = new Random();
-        boolean blockIsFull = false;
-
-        while (!blockIsFull) {
-            int index = random.nextInt(Chain.getInstance().getTransactionsPool().size());
-            Transaction transactionChecked = Chain.getInstance().getTransactionsPool().get(index);
-            if(!transationsToValidate.contains(transactionChecked) && transactionChecked.getValidationStatus() == 2 && this.transactionIsValid(transactionChecked)) {
-                transationsToValidate.add(transactionChecked);
-                if(transationsToValidate.size() == Chain.BLOCK_SIZE) {
-                    blockIsFull = true;
-                }
+    public ArrayList<Transaction> validatedTransactions() {
+        ArrayList<Transaction> transationsValidated = new ArrayList<>();
+        for(Transaction transactionChecked : this.newTransactions) {
+            if(transactionChecked.getValidationStatus() == 2 && this.transactionIsValid(transactionChecked)) {
+                transationsValidated.add(transactionChecked);
             }
         }
 
-        return transationsToValidate;
+        return transationsValidated;
     }
 
     public void mine() {
@@ -72,9 +69,7 @@ public class Miner extends User {
     }
 
     public void addTransactionToBlock(ArrayList<Transaction> transactions) {
-        for(Transaction transaction : transactions) {
-            this.currentBlock.getTransactions().add(transaction);
-        }
+        this.currentBlock.setTransactions(transactions);
     }
 
     public boolean transactionIsValid(Transaction transactionToValidate) {
@@ -110,8 +105,19 @@ public class Miner extends User {
         return result;
     }
 
+    public void notify(Transaction transaction) {
+        newTransactions.add(transaction);
+        if(this.newTransactions.size() == Chain.getInstance().BLOCK_SIZE) {
+            this.miningProcess();
+        }
+    }
+
     public Block getCurrentBlock() {
         return this.currentBlock;
+    }
+
+    public ArrayList<Transaction> getNewTransactions() {
+        return this.newTransactions;
     }
 
     /*

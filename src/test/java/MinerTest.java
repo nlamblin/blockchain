@@ -8,34 +8,40 @@ import static org.junit.Assert.assertEquals;
 
 public class MinerTest {
 
-    private Trader trader1 = new Trader("trader1", 10);
-    private Trader trader2 = new Trader("id123", "trader2", 5);
-    private Trader trader3 = new Trader("xyz123", "trader3", 2);
-    private Miner miner = new Miner("miner", 1);
+    private Trader trader1;
+    private Trader trader2;
+    private Trader trader3;
+    private Miner miner;
 
     @Before
     public void clearMap() {
-        Chain.getInstance().transactionsPool.clear();
+        Main.miners.clear();
+        Main.traders.clear();
+        this.trader1 = new Trader("trader1", 10);
+        this.trader2 = new Trader("id123", "trader2", 5);
+        this.trader3 = new Trader("xyz123", "trader3", 2);
+        this.miner = new Miner("miner", 1);
+        miner.getNewTransactions().clear();
     }
 
     @Test
     public void TestValidateTransaction_OK() {
         trader1.sendMoney("id123", 1);
-        Transaction transaction = Chain.getInstance().transactionsPool.get(0);
+        Transaction transaction = miner.getNewTransactions().get(0);
         assertTrue(miner.transactionIsValid(transaction));
     }
 
     @Test
     public void TestValidateTransaction_OkMin() {
         trader1.sendMoney("id123", 0.1);
-        Transaction transaction = Chain.getInstance().transactionsPool.get(0);
+        Transaction transaction = miner.getNewTransactions().get(0);
         assertTrue(miner.transactionIsValid(transaction));
     }
 
     @Test
     public void TestValidateTransaction_ReceiverNotFound() {
         trader1.sendMoney("id12345", 1);
-        Transaction transaction = Chain.getInstance().transactionsPool.get(0);
+        Transaction transaction = miner.getNewTransactions().get(0);
         assertFalse(miner.transactionIsValid(transaction));
         assertEquals(0, transaction.getValidationStatus());
     }
@@ -43,7 +49,7 @@ public class MinerTest {
     @Test
     public void TestValidateTransaction_NotEnoughMoney() {
         trader1.sendMoney("id123", 12);
-        Transaction transaction = Chain.getInstance().transactionsPool.get(0);
+        Transaction transaction = miner.getNewTransactions().get(0);
         assertFalse(miner.transactionIsValid(transaction));
         assertEquals(0, transaction.getValidationStatus());
     }
@@ -51,7 +57,7 @@ public class MinerTest {
     @Test
     public void TestValidateTransaction_NoMinAmount() {
         trader1.sendMoney("id123", 0.05);
-        Transaction transaction = Chain.getInstance().transactionsPool.get(0);
+        Transaction transaction = miner.getNewTransactions().get(0);
         assertFalse(miner.transactionIsValid(transaction));
         assertEquals(0, transaction.getValidationStatus());
     }
@@ -62,9 +68,7 @@ public class MinerTest {
         trader1.sendMoney("xyz123", 1);
         trader2.sendMoney("xyz123", 2);
         miner.createBlock("####");
-
-        miner.addTransactionToBlock(Chain.getInstance().getTransactionsPool());
-
+        miner.addTransactionToBlock(miner.getNewTransactions());
         miner.mine();
 
         String hash = miner.currentBlock.getHash();
