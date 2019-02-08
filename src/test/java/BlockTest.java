@@ -1,4 +1,3 @@
-import org.junit.Before;
 import org.junit.Test;
 
 import java.sql.Timestamp;
@@ -7,18 +6,10 @@ import static org.junit.Assert.*;
 
 public class BlockTest {
 
-    private Trader trader1;
-    private Trader trader2;
-    private Trader trader3;
-    private Miner miner;
-
-    @Before
-    public void beforeTests() {
-        this.trader1 = new Trader("abc100", "trader1", 20);
-        this.trader2 = new Trader("def200", "trader2", 40);
-        this.trader3 = new Trader("ghi300", "trader3", 12);
-        this.miner = new Miner("miner", 1);
-    }
+    private Trader trader1 = new Trader("abc100", "trader1", 20);
+    private Trader trader2 = new Trader("def200", "trader2", 40);
+    private Trader trader3 = new Trader("ghi300", "trader3", 12);
+    private Miner miner = new Miner("miner", 1);
 
     @Test
     public void TestConstructor() {

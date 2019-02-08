@@ -22,6 +22,6 @@ public class UserTest {
         User user = new User(id, name, balance);
         assertEquals(user.getName(), name);
         assertEquals(user.getBalance(), balance, 0.0);
-        assertNotNull(id, user.getId());
+        assertEquals(id, user.getId());
     }
 }
