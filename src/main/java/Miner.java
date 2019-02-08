@@ -100,7 +100,7 @@ public class Miner extends User {
         return transactionIsValid;
     }
 
-    public boolean checkIfChainIsValid() {
+    public boolean chainIsValid() {
         boolean result = true;
         int i = 1;
         while(i < Chain.getInstance().getBlocks().size() || !result) {

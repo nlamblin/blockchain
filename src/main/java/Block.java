@@ -1,3 +1,4 @@
+import javax.sound.midi.SysexMessage;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
@@ -28,8 +29,13 @@ public class Block {
         ArrayList<String> layer = previousLayer;
         while(countNodesLeft > 1) {
             layer = new ArrayList<String>();
-            for(int i = 1; i < previousLayer.size(); i = i+2) {
-                layer.add(Tools.applyHash(previousLayer.get(i-1) + previousLayer.get(i)));
+            int i = 0;
+            while (previousLayer.size() - i > 1) {
+                layer.add(Tools.applyHash(previousLayer.get(i) + previousLayer.get(i + 1)));
+                i += 2;
+            }
+            if(previousLayer.size() - i == 1) {
+                layer.add(previousLayer.get(previousLayer.size()-1));
             }
             countNodesLeft = layer.size();
             previousLayer = layer;

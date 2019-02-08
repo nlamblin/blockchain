@@ -32,7 +32,7 @@ public class Main {
         trader3.sendMoney(trader2.getId(), 2.2);
         miner.fullProcess(chain.getBlocks().get(chain.getBlocks().size()-1).getHash());
 
-        miner.checkIfChainIsValid();
+        miner.chainIsValid();
 
         System.out.println(Chain.getInstance().toString());
     }
