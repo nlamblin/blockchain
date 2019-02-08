@@ -16,7 +16,7 @@ public class TransactionTest {
         assertEquals(t.getSender(), trader1.getId());
         assertEquals(t.getReceiver(), trader2.getId());
         assertNotNull(t.getTimestamp());
-        assertFalse(t.getAlreadyValidate());
+        assertEquals(t.getValidationStatus(), 2);
     }
 
     @Test
@@ -29,7 +29,7 @@ public class TransactionTest {
     @Test
     public void TestAlreadyValidateTrue() {
         Transaction t = new Transaction(10, new Trader("trader1", 50).getId(), new Trader("trader2", 140).getId());
-        t.setAlreadyValidate();
-        assertTrue(t.getAlreadyValidate());
+        t.setValidationStatus(1);
+        assertEquals(1, t.getValidationStatus());
     }
 }

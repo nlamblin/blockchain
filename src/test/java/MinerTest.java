@@ -29,8 +29,6 @@ public class MinerTest {
         Transaction transaction = Chain.getInstance().transactionsPool.get(0);
 
         assertTrue(miner.transactionIsValid(transaction));
-        assertEquals(9, trader1.getBalance(), 0.0);
-        assertEquals(6, trader2.getBalance(), 0.0);
     }
 
     @Test
@@ -39,8 +37,6 @@ public class MinerTest {
         Transaction transaction = Chain.getInstance().transactionsPool.get(0);
 
         assertTrue(miner.transactionIsValid(transaction));
-        assertEquals(9.9, trader1.getBalance(), 0.0);
-        assertEquals(5.1, trader2.getBalance(), 0.0);
     }
 
     @Test
@@ -48,7 +44,6 @@ public class MinerTest {
         trader1.sendMoney("id12345", 1);
         Transaction transaction = Chain.getInstance().transactionsPool.get(0);
 
-        assertEquals(10, trader1.getBalance(), 0.0);
         assertFalse(miner.transactionIsValid(transaction));
     }
 
@@ -58,8 +53,6 @@ public class MinerTest {
         Transaction transaction = Chain.getInstance().transactionsPool.get(0);
 
         assertFalse(miner.transactionIsValid(transaction));
-        assertEquals(10, trader1.getBalance(), 0.0);
-        assertEquals(5, trader2.getBalance(), 0.0);
     }
 
     @Test
@@ -68,8 +61,6 @@ public class MinerTest {
         Transaction transaction = Chain.getInstance().transactionsPool.get(0);
 
         assertFalse(miner.transactionIsValid(transaction));
-        assertEquals(10, trader1.getBalance(), 0.0);
-        assertEquals(5, trader2.getBalance(), 0.0);
     }
 
     @Test
@@ -91,6 +82,9 @@ public class MinerTest {
             assertEquals(hash.charAt(i), '0');
         }
         assertEquals(initialSize+1, Chain.getInstance().getBlocks().size());
+        assertEquals(9, trader1.getBalance(), 0.0);
+        assertEquals(3, trader2.getBalance(), 0.0);
+        assertEquals(5, trader3.getBalance(), 0.0);
     }
 
     @Test

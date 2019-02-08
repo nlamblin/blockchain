@@ -32,14 +32,18 @@ public class Miner extends User {
     }
 
     public ArrayList<Transaction> findTransactionsToValidate() {
-        ArrayList<Transaction> transationsToValidate = new ArrayList();
+        ArrayList<Transaction> transationsToValidate = new ArrayList<>();
         Random random = new Random();
+        boolean blockIsFull = false;
 
-        while (transationsToValidate.size() < Chain.BLOCK_SIZE) {
-            int index = random.nextInt(Chain.getInstance().getTransactionsPool().size() - 1);
+        while (!blockIsFull) {
+            int index = random.nextInt(Chain.getInstance().getTransactionsPool().size());
             Transaction transactionChecked = Chain.getInstance().getTransactionsPool().get(index);
-            if(!transactionChecked.getAlreadyValidate()) {
+            if(!transationsToValidate.contains(transactionChecked) && transactionChecked.getValidationStatus() == 2) {
                 transationsToValidate.add(transactionChecked);
+                if(transationsToValidate.size() == Chain.BLOCK_SIZE) {
+                    blockIsFull = true;
+                }
             }
         }
 
@@ -62,7 +66,12 @@ public class Miner extends User {
             }
         }
         for(Transaction transaction : this.currentBlock.getTransactions()) {
-            transaction.setAlreadyValidate();
+            transaction.setValidationStatus(1);
+            User sender = Main.traders.get(transaction.getSender());
+            User receiver = Main.traders.get(transaction.getReceiver());
+            double amount = transaction.getAmount();
+            sender.setBalance(sender.getBalance()-amount);
+            receiver.setBalance(receiver.getBalance()+amount);
         }
         this.currentBlock.setHash(hash);
         Chain.getInstance().addBlock(this.currentBlock);
@@ -80,23 +89,20 @@ public class Miner extends User {
 
         User sender = Main.traders.get(transactionToValidate.getSender());
         User receiver = Main.traders.get(transactionToValidate.getReceiver());
-        double senderBalance = sender.getBalance();
         double amount = transactionToValidate.getAmount();
 
         if(receiver == null) {
             transactionIsValid = false;
         }
-        else if(amount > senderBalance ) {
+        else if(amount > sender.getBalance()) {
             transactionIsValid = false;
         }
         else if(amount < Chain.MIN_AMOUNT) {
             transactionIsValid = false;
         }
 
-        if(transactionIsValid) {
-            sender.setBalance(senderBalance-amount);
-            receiver.setBalance(receiver.getBalance()+amount);
-        }
+        if(!transactionIsValid) transactionToValidate.setValidationStatus(0);
+
         return transactionIsValid;
     }
 

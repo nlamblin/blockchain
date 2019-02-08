@@ -7,14 +7,14 @@ public class Transaction {
     private Timestamp timestamp;
     private String senderId;
     private String receiverId;
-    private boolean alreadyValidate;
+    private int validationStatus; // 0 : not validated, 1 : validated , 2 : not yet validated
 
     public Transaction(double amount, String senderId, String receiverId) {
         this.amount = amount;
         this.senderId = senderId;
         this.receiverId = receiverId;
         this.timestamp = new Timestamp(System.currentTimeMillis());
-        this.alreadyValidate = false;
+        this.validationStatus = 2;
         generateHash();
     }
 
@@ -48,12 +48,12 @@ public class Transaction {
 
     public void setReceiverId(String receiverId) { this.receiverId = receiverId; }
 
-    public boolean getAlreadyValidate() {
-        return this.alreadyValidate;
+    public int getValidationStatus() {
+        return this.validationStatus;
     }
 
-    public void setAlreadyValidate() {
-        this.alreadyValidate = (this.alreadyValidate) ? false : true;
+    public void setValidationStatus(int status) {
+        this.validationStatus = status;
     }
 
     public String toString() {
@@ -62,6 +62,6 @@ public class Transaction {
             "\t\t Sender : " + this.senderId + "\n" +
             "\t\t Receiver : " + this.receiverId + "\n" +
             "\t\t Timestamp : " + this.timestamp + "\n" +
-            "\t\t Validated : " + this.alreadyValidate + "\n";
+            "\t\t Validated : " + this.validationStatus + "\n";
     }
 }
