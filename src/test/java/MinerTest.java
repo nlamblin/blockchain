@@ -1,6 +1,8 @@
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
@@ -61,10 +63,7 @@ public class MinerTest {
         trader2.sendMoney("xyz123", 2);
         miner.createBlock("####");
 
-        for(Transaction transaction : Chain.getInstance().getTransactionsPool()) {
-            miner.transactionIsValid(transaction);
-            miner.addTransaction(transaction);
-        }
+        miner.addTransactionToBlock(Chain.getInstance().getTransactionsPool());
 
         miner.mine();
 
@@ -79,11 +78,15 @@ public class MinerTest {
     }
 
     @Test
-    public void TestAddTransaction() {
+    public void TestAddTransactionsToBlock() {
+        ArrayList<Transaction> transactions = new ArrayList<>();
+        Transaction transaction1 = new Transaction(0.1, "id123", "xyz123");
+        Transaction transaction2 = new Transaction(0.2, "xyz123", "id123");
+        transactions.add(transaction1);
+        transactions.add(transaction2);
         miner.createBlock("####");
-        int initialSize = miner.currentBlock.getTransactions().size();
-        miner.addTransaction(new Transaction(10, "id123", "xyz123"));
-        assertEquals(initialSize + 1, miner.currentBlock.getTransactions().size());
+        miner.addTransactionToBlock(transactions);
+        assertEquals(miner.currentBlock.getTransactions().size(), transactions.size());
     }
 
 }

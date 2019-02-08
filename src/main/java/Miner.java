@@ -16,22 +16,16 @@ public class Miner extends User {
 
     public void fullProcess(String previousHash) {
         this.createBlock(previousHash);
-        ArrayList<Transaction> transactions = this.findTransactionsToValidate();
-        this.validateTransactions(transactions);
-        if(!this.currentBlock.getTransactions().isEmpty()) {
-            this.mine();
-        }
+        ArrayList<Transaction> transactions = this.findTransactions();
+        this.addTransactionToBlock(transactions);
+        this.mine();
     }
 
     public void createBlock(String previousHash) {
         this.currentBlock = new Block(previousHash);
     }
 
-    public void addTransaction(Transaction transaction) {
-        this.currentBlock.getTransactions().add(transaction);
-    }
-
-    public ArrayList<Transaction> findTransactionsToValidate() {
+    public ArrayList<Transaction> findTransactions() {
         ArrayList<Transaction> transationsToValidate = new ArrayList<>();
         Random random = new Random();
         boolean blockIsFull = false;
@@ -39,7 +33,7 @@ public class Miner extends User {
         while (!blockIsFull) {
             int index = random.nextInt(Chain.getInstance().getTransactionsPool().size());
             Transaction transactionChecked = Chain.getInstance().getTransactionsPool().get(index);
-            if(!transationsToValidate.contains(transactionChecked) && transactionChecked.getValidationStatus() == 2) {
+            if(!transationsToValidate.contains(transactionChecked) && transactionChecked.getValidationStatus() == 2 && this.transactionIsValid(transactionChecked)) {
                 transationsToValidate.add(transactionChecked);
                 if(transationsToValidate.size() == Chain.BLOCK_SIZE) {
                     blockIsFull = true;
@@ -77,10 +71,9 @@ public class Miner extends User {
         Chain.getInstance().addBlock(this.currentBlock);
     }
 
-    public void validateTransactions(ArrayList<Transaction> transactions) {
+    public void addTransactionToBlock(ArrayList<Transaction> transactions) {
         for(Transaction transaction : transactions) {
-            boolean transactionIsValid = this.transactionIsValid(transaction);
-            if(transactionIsValid) this.addTransaction(transaction);
+            this.currentBlock.getTransactions().add(transaction);
         }
     }
 
@@ -121,4 +114,10 @@ public class Miner extends User {
         return this.currentBlock;
     }
 
+    /*
+    * ONLY FOR JUNIT TEST
+     */
+    public void addTransaction(Transaction transaction) {
+        this.currentBlock.getTransactions().add(transaction);
+    }
 }
