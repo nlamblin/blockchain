@@ -1,3 +1,4 @@
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,12 +12,19 @@ public class ChainTest {
     }
 
     @Test
-    public void TestAddBlock() {
+    public void TestSingleton() {
         Chain chain = Chain.getInstance();
-        int initialSize = chain.getBlocks().size();
-        chain.addBlock(new Block("77685afb04ce2a8b334464fa0508ebcc97b8a75695a97fede1794453906f1245"));
-        assertEquals(initialSize+1, chain.getBlocks().size());
+        assertEquals(chain, chain.getInstance());
     }
+
+    @Test
+    public void TestAddBlock() {
+        int initialSize = Chain.getInstance().getBlocks().size();
+        Chain.getInstance().addBlock(new Block("77685afb04ce2a8b334464fa0508ebcc97b8a75695a97fede1794453906f1245"));
+        assertEquals(initialSize+1, Chain.getInstance().getBlocks().size());
+    }
+
+
 
     // @TODO
     /*@Test

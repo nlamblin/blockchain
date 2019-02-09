@@ -1,8 +1,15 @@
+import org.junit.AfterClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class TraderTest {
+
+    @AfterClass
+    public static void initClass() {
+        Main.traders.clear();
+        Main.miners.clear();
+    }
 
     @Test
     public void TestSendMoney() {

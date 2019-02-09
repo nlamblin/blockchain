@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class Miner extends User {
 
-    public Block currentBlock;
+    private Block currentBlock;
     private ArrayList<Transaction> newTransactions;
 
     public Miner(String name, float balance) {
@@ -20,7 +20,7 @@ public class Miner extends User {
     public void miningProcess() {
         String previousHash = (Chain.getInstance().getBlocks().isEmpty()) ? "####" : Chain.getInstance().getBlocks().get(Chain.getInstance().getBlocks().size()-1).getHash();
         this.createBlock(previousHash);
-        ArrayList<Transaction> validatedTransactions = this.validatedTransactions();
+        ArrayList<Transaction> validatedTransactions = this.validateTransactions();
         this.addTransactionToBlock(validatedTransactions);
         this.mine();
         this.newTransactions.clear();
@@ -30,7 +30,7 @@ public class Miner extends User {
         this.currentBlock = new Block(previousHash);
     }
 
-    public ArrayList<Transaction> validatedTransactions() {
+    public ArrayList<Transaction> validateTransactions() {
         ArrayList<Transaction> transationsValidated = new ArrayList<>();
         for(Transaction transactionChecked : this.newTransactions) {
             if(transactionChecked.getValidationStatus() == 2 && this.transactionIsValid(transactionChecked)) {
@@ -106,8 +106,8 @@ public class Miner extends User {
     }
 
     public void notify(Transaction transaction) {
-        newTransactions.add(transaction);
-        if(this.newTransactions.size() == Chain.getInstance().BLOCK_SIZE) {
+        this.newTransactions.add(transaction);
+        if(this.newTransactions.size() == Chain.BLOCK_SIZE) {
             this.miningProcess();
         }
     }
@@ -116,14 +116,11 @@ public class Miner extends User {
         return this.currentBlock;
     }
 
-    public ArrayList<Transaction> getNewTransactions() {
-        return this.newTransactions;
+    public void setCurrentBlock(Block block) {
+        this.currentBlock = block;
     }
 
-    /*
-    * ONLY FOR JUNIT TEST
-     */
-    public void addTransaction(Transaction transaction) {
-        this.currentBlock.getTransactions().add(transaction);
+    public ArrayList<Transaction> getNewTransactions() {
+        return this.newTransactions;
     }
 }
