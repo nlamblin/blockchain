@@ -67,10 +67,6 @@ public class Miner extends User {
         }
         else if(!this.verifySignature(transactionToValidate)) {
             transactionIsValid = false;
-<<<<<<< HEAD
-=======
-            System.out.println("here");
->>>>>>> 86b76c4... feature/test : remove user id, use public and private key + sign method + verifySignature method
         }
 
         return transactionIsValid;

@@ -48,22 +48,10 @@ public class MinerTest {
 
     @Test
     public void TestValidateTransaction_ReceiverNotFound() throws NoSuchAlgorithmException, InvalidKeySpecException {
-<<<<<<< HEAD
         PublicKey oldPublicKey = trader3.getPublicKey();
         // to prevent the fact that the new public key is already the current public key
         String key = this.getNewKey(trader3);
         this.setNewKey(trader3, key);
-=======
-        // to prevent the fact that the new public key is already the one used
-        String key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr+jR296B8EZDXsD019JfKbYgeN+l43Dp+Gag6bU4LwTsDEa6upj5wxLLPGwH+D2Y6aSmmAFU6m4mFeAcNDEwYZ2OpT5X2E8B3L38Lh0Kkx39AooiLWHNBIWUtIXuziXbxOBsBjh5QlwvUL/Op1T7VVtiGrrn8RGA76eUI5WhfDQUqvpCF8Ee0W7IyypmmXzJnYyCqa8WxqvBcK4yUfAsBAwzCh7D8eYXrbbI9EB1nR7JTmJ9aYdhhrgDoUCdLPPQ+XfBAX569a51iN3/A9IMqGFogGn8ILJhw5rNHb68EQuT/4sO6l28LxJOApdBBT+89jdr9mzwPyG8/WmA4U/ofQIDAQAB";
-        if(Tools.getStringFromKey(trader3.getPublicKey()).equals(key)) {
-            key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqRuhpS7YWRzPRdShYq/cPZZyfFQwG/28KSRmkUNRkeihBfUKjpHC0iIfUKu2ia1Sj3SUU+N3zn5etzih+hUodiyWWcaiu0ir8PunnBL0KcGTj+ASjDVjJWDbnS3anPXUZIOg5ULFdBEy1vycQbBNHN0eYaNqSTwSelug5oxa+vntqbfANaK5pN5GTgdGTEy4HrZc2S3EVWuYXYBz0+a/+js5gdVwf/tXnp3tv0/tDODRPWifyjsZN0brTvTNxbS7WFxYBK6Fq3kZm/yjGKEquR9pOEamyR/p8//YiGf+eGxI9vU3HLXBnQLe+/2nf6AQmatmrWAQCzXyNboq2RpRsQIDAQAB";
-        }
-
-        PublicKey oldPublicKey = trader3.getPublicKey();
-        byte[] keyBytes = Base64.getDecoder().decode(key);
-        trader3.setPublicKey(KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(keyBytes)));
->>>>>>> 86b76c4... feature/test : remove user id, use public and private key + sign method + verifySignature method
         Transaction transaction = new Transaction(0.05, trader2.getPublicKey(), oldPublicKey);
         assertFalse(miner.transactionIsValid(transaction));
         trader3.setPublicKey(oldPublicKey); // restore the initial public key
@@ -161,11 +149,7 @@ public class MinerTest {
     public void TestMiningProcess_EnoughTransactions() {
         miner.createBlock();
         for(int i = 0; i < Chain.BLOCK_SIZE; i++) {
-<<<<<<< HEAD
             miner.getCurrentBlock().getTransactions().add(new Transaction(0.2, trader3.getPublicKey(), trader2.getPublicKey()));
-=======
-            miner.getCurrentBlock().getTransactions().add(new Transaction(0.2, trader1.getPublicKey(), trader2.getPublicKey()));
->>>>>>> 86b76c4... feature/test : remove user id, use public and private key + sign method + verifySignature method
         }
         miner.miningProcess();
         assertEquals(1, Chain.getInstance().getBlocks().size());
@@ -205,7 +189,6 @@ public class MinerTest {
     }
 
     @Test
-<<<<<<< HEAD
     public void TestVerifySignature_OK() {
         trader1.sendMoney(trader2.getPublicKey(), 1);
         assertTrue(miner.verifySignature(miner.getCurrentBlock().getTransactions().get(0)));
@@ -223,10 +206,4 @@ public class MinerTest {
         byte[] keyBytes = Base64.getDecoder().decode(key);
         user.setPublicKey(KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(keyBytes)));
     }
-=======
-    public void verifySignature() {
-        trader1.sendMoney(trader2.getPublicKey(), 1);
-        assertTrue(miner.verifySignature(miner.getCurrentBlock().getTransactions().get(0)));
-    }
->>>>>>> 86b76c4... feature/test : remove user id, use public and private key + sign method + verifySignature method
 }

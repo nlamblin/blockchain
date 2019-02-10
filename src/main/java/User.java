@@ -13,17 +13,10 @@ public class User {
         this.generateKeys();
 
         if(this instanceof Miner) {
-<<<<<<< HEAD
             Main.miners.put(this.publicKey, (Miner) this);
         }
         else if(this instanceof Trader) {
             Main.traders.put(this.publicKey, (Trader) this);
-=======
-            Main.miners.put(this.getPublicKey(), (Miner) this);
-        }
-        if(this instanceof Trader) {
-            Main.traders.put(this.getPublicKey(), (Trader) this);
->>>>>>> 86b76c4... feature/test : remove user id, use public and private key + sign method + verifySignature method
         }
     }
 
