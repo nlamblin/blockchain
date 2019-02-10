@@ -1,5 +1,7 @@
 import java.security.Key;
 import java.security.MessageDigest;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.util.Base64;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -26,5 +28,12 @@ class Tools {
 
     static String getStringFromKey(Key key) {
         return Base64.getEncoder().encodeToString(key.getEncoded());
+    }
+
+    static void updateForSignature(Signature signature, Transaction transaction) throws SignatureException {
+        String senderKeyString = Tools.getStringFromKey(transaction.getSender());
+        String receiverKeyString = Tools.getStringFromKey(transaction.getReceiver());
+        String data = transaction.getAmount() + senderKeyString + receiverKeyString + transaction.getTimestamp();
+        signature.update(data.getBytes(UTF_8));
     }
 }

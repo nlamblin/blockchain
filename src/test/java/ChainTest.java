@@ -24,12 +24,4 @@ public class ChainTest {
         assertEquals(initialSize+1, Chain.getInstance().getBlocks().size());
     }
 
-
-
-    // @TODO
-    /*@Test
-    public void TestChainIsCorrect() {
-
-    }*/
-
 }

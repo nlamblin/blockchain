@@ -1,4 +1,6 @@
+import java.security.Signature;
 import java.sql.Timestamp;
+import java.util.Base64;
 import java.util.Random;
 
 public class Miner extends User {
@@ -7,10 +9,6 @@ public class Miner extends User {
 
     public Miner(String name, float balance) {
         super(name, balance);
-    }
-
-    public Miner(String id, String name, float balance) {
-        super(id, name, balance);
     }
 
     public void notify(Transaction newTransaction) {
@@ -35,6 +33,22 @@ public class Miner extends User {
         }
     }
 
+    public boolean verifySignature(Transaction transaction) {
+        boolean result = false;
+        try {
+            Signature publicSignature = Signature.getInstance("SHA256withRSA");
+            User sender = Main.traders.get(transaction.getSender());
+            publicSignature.initVerify(sender.getPublicKey());
+            Tools.updateForSignature(publicSignature, transaction);
+            byte[] signatureBytes = Base64.getDecoder().decode(transaction.getSignature());
+            result = publicSignature.verify(signatureBytes);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
     public boolean transactionIsValid(Transaction transactionToValidate) {
         boolean transactionIsValid = true;
 
@@ -50,6 +64,13 @@ public class Miner extends User {
         }
         else if(amount < Chain.MIN_AMOUNT) {
             transactionIsValid = false;
+        }
+        else if(!this.verifySignature(transactionToValidate)) {
+            transactionIsValid = false;
+<<<<<<< HEAD
+=======
+            System.out.println("here");
+>>>>>>> 86b76c4... feature/test : remove user id, use public and private key + sign method + verifySignature method
         }
 
         return transactionIsValid;

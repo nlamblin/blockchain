@@ -1,3 +1,4 @@
+import java.security.PublicKey;
 import java.sql.Timestamp;
 
 public class Transaction {
@@ -5,21 +6,24 @@ public class Transaction {
     private double amount;
     private String hash;
     private Timestamp timestamp;
-    private String senderId;
-    private String receiverId;
+    private PublicKey senderKey;
+    private PublicKey receiverKey;
     private int validationStatus; // 0 : not validated, 1 : validated , 2 : not yet validated
+    private String signature;
 
-    public Transaction(double amount, String senderId, String receiverId) {
+    public Transaction(double amount, PublicKey senderKey, PublicKey receiverKey) {
         this.amount = amount;
-        this.senderId = senderId;
-        this.receiverId = receiverId;
+        this.senderKey = senderKey;
+        this.receiverKey = receiverKey;
         this.timestamp = new Timestamp(System.currentTimeMillis());
         this.validationStatus = 2;
         generateHash();
     }
 
     public void generateHash() {
-        this.hash = Tools.applyHash(this.amount + this.senderId + this.receiverId + this.timestamp);
+        String senderKeyString = Tools.getStringFromKey(this.senderKey);
+        String receiverKeyString = Tools.getStringFromKey(this.receiverKey);
+        this.hash = Tools.applyHash(this.amount + senderKeyString + receiverKeyString + this.timestamp);
     }
 
     public double getAmount() { return this.amount; }
@@ -40,13 +44,13 @@ public class Transaction {
 
     public void setTimestamp(Timestamp timestamp) { this.timestamp = timestamp; }
 
-    public String getSender() { return senderId; }
+    public PublicKey getSender() { return senderKey; }
 
-    public void setSenderId(String sender) { this.senderId = senderId; }
+    public void setSenderKey(String sender) { this.senderKey = senderKey; }
 
-    public String getReceiver() { return receiverId; }
+    public PublicKey getReceiver() { return receiverKey; }
 
-    public void setReceiverId(String receiverId) { this.receiverId = receiverId; }
+    public void setReceiverKey(PublicKey receiverKey) { this.receiverKey = receiverKey; }
 
     public int getValidationStatus() {
         return this.validationStatus;
@@ -56,11 +60,19 @@ public class Transaction {
         this.validationStatus = status;
     }
 
+    public String getSignature() {
+        return this.signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
+
     public String toString() {
         return "\t\t Hash : " + this.hash + "\n" +
             "\t\t Amount : " + this.amount + "\n" +
-            "\t\t Sender : " + this.senderId + "\n" +
-            "\t\t Receiver : " + this.receiverId + "\n" +
+            "\t\t Sender : " + Tools.getStringFromKey(this.senderKey) + "\n" +
+            "\t\t Receiver : " + Tools.getStringFromKey(this.receiverKey) + "\n" +
             "\t\t Timestamp : " + this.timestamp + "\n" +
             "\t\t Validated : " + this.validationStatus + "\n";
     }

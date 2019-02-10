@@ -1,3 +1,4 @@
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -14,7 +15,7 @@ public class Chain {
     }
 
     public void putNewTransaction(Transaction transaction) {
-        for(Map.Entry<String, Miner> entry : Main.miners.entrySet()) {
+        for(Map.Entry<PublicKey, Miner> entry : Main.miners.entrySet()) {
             entry.getValue().notify(transaction);
         }
     }
