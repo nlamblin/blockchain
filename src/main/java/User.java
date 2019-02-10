@@ -1,34 +1,35 @@
-import java.util.UUID;
+import java.security.*;
 
 public class User {
 
-    protected String id;
     protected String name;
     protected double balance;
+    protected PublicKey publicKey;
+    protected PrivateKey privateKey;
 
     public User(String name, double balance) {
-        this(UUID.randomUUID().toString(), name, balance);
-    }
-
-    public User(String id, String name, double balance) {
-        this.id = id;
         this.name = name;
         this.balance = balance;
+        this.generateKeys();
 
         if(this instanceof Miner) {
-            Main.miners.put(this.id, (Miner) this);
+            Main.miners.put(this.getPublicKey(), (Miner) this);
         }
         if(this instanceof Trader) {
-            Main.traders.put(this.id, (Trader) this);
+            Main.traders.put(this.getPublicKey(), (Trader) this);
         }
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+    private void generateKeys() {
+        try {
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            keyPairGenerator.initialize(2048);
+            KeyPair keyPair = keyPairGenerator.generateKeyPair();
+            this.privateKey = keyPair.getPrivate();
+            this.publicKey = keyPair.getPublic();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getName() {
@@ -46,4 +47,13 @@ public class User {
     public void setBalance(double balance) {
         this.balance = balance;
     }
+
+    public PublicKey getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(PublicKey publicKey) {
+        this.publicKey = publicKey;
+    }
+
 }
