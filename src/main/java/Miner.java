@@ -14,21 +14,21 @@ public class Miner extends User {
     }
 
     public void notify(Transaction newTransaction) {
-        if(this.currentBlock == null) this.createBlock();
+        this.createBlock();
         this.validateNewTransaction(newTransaction);
+        this.miningProcess();
     }
 
     public void createBlock() {
-        String previousBlockHash = (Chain.getInstance().getBlocks().isEmpty()) ? "####" : Chain.getInstance().getBlocks().get(Chain.getInstance().getBlocks().size()-1).getHash();
-        this.currentBlock = new Block(previousBlockHash);
+        if(this.currentBlock == null) {
+            String previousBlockHash = (Chain.getInstance().getBlocks().isEmpty()) ? "####" : Chain.getInstance().getBlocks().get(Chain.getInstance().getBlocks().size() - 1).getHash();
+            this.currentBlock = new Block(previousBlockHash);
+        }
     }
 
     public void validateNewTransaction(Transaction newTransaction) {
         if(this.transactionIsValid(newTransaction) && newTransaction.getValidationStatus() == 2) {
             this.currentBlock.getTransactions().add(newTransaction);
-            if(this.currentBlock.getTransactions().size() == Chain.BLOCK_SIZE) {
-                this.miningProcess();
-            }
         }
         else {
             newTransaction.setValidationStatus(0);
@@ -56,8 +56,11 @@ public class Miner extends User {
     }
 
     public void miningProcess() {
-        this.mine();
-        this.currentBlock = null;
+        if(this.currentBlock.getTransactions().size() == Chain.BLOCK_SIZE) {
+            this.mine();
+            Chain.getInstance().getBlocks().add(this.currentBlock);
+            this.currentBlock = null;
+        }
     }
 
     public void mine() {
@@ -76,23 +79,27 @@ public class Miner extends User {
             }
         }
         for(Transaction transaction : this.currentBlock.getTransactions()) {
+            exchangeMoney(transaction);
             transaction.setValidationStatus(1);
-            User sender = Main.traders.get(transaction.getSender());
-            User receiver = Main.traders.get(transaction.getReceiver());
-            double amount = transaction.getAmount();
-            sender.setBalance(sender.getBalance()-amount);
-            receiver.setBalance(receiver.getBalance()+amount);
         }
         this.currentBlock.setHash(hash);
-        Chain.getInstance().addBlock(this.currentBlock);
+    }
+
+    public void exchangeMoney(Transaction transaction) {
+        User sender = Main.traders.get(transaction.getSender());
+        User receiver = Main.traders.get(transaction.getReceiver());
+        double amount = transaction.getAmount();
+        sender.setBalance(sender.getBalance()-amount);
+        receiver.setBalance(receiver.getBalance()+amount);
     }
 
     public boolean chainIsValid() {
         boolean result = true;
         int i = 1;
-        while(i < Chain.getInstance().getBlocks().size() || !result) {
-            if (!Chain.getInstance().getBlocks().get(i).getPreviousHash().equals(Chain.getInstance().getBlocks().get(i-1).getHash()))
+        while(i < Chain.getInstance().getBlocks().size() && result) {
+            if (!Chain.getInstance().getBlocks().get(i).getPreviousHash().equals(Chain.getInstance().getBlocks().get(i-1).getHash())) {
                 result = false;
+            }
             i++;
         }
         return result;

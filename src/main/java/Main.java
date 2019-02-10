@@ -27,8 +27,9 @@ public class Main {
         trader1.sendMoney(trader3.getId(), 2.1);
         trader3.sendMoney(trader2.getId(), 2.2);
 
-        miner.chainIsValid();
-
-        System.out.println(Chain.getInstance().toString());
+        if(miner.chainIsValid())
+            System.out.println(Chain.getInstance().toString());
+        else
+            System.out.println("Chain is not valid !");
     }
 }

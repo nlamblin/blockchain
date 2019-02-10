@@ -1,5 +1,5 @@
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.sql.Timestamp;
@@ -13,8 +13,13 @@ public class BlockTest {
     private static Trader trader3 = new Trader("ghi300", "trader3", 12);
     private static Miner miner = new Miner("miner", 1);
 
+    @Before
+    public void initTest() {
+        miner.setCurrentBlock(null);
+    }
+
     @AfterClass
-    public static void initClass() {
+    public static void clearClass() {
         Main.traders.clear();
         Main.miners.clear();
     }

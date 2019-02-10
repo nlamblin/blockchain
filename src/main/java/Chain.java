@@ -13,6 +13,21 @@ public class Chain {
         this.blocks = new ArrayList<Block>();
     }
 
+    public void putNewTransaction(Transaction transaction) {
+        for(Map.Entry<String, Miner> entry : Main.miners.entrySet()) {
+            entry.getValue().notify(transaction);
+        }
+    }
+
+    public String toString() {
+        String chainString = "";
+        for(Block block : blocks) {
+            chainString += "Block n°: " + blocks.indexOf(block) + "\n" +
+                    block.toString() + "\n\n";
+        }
+        return chainString;
+    }
+
     public static Chain getInstance() {
         if(chain == null) {
             chain = new Chain();
@@ -26,21 +41,6 @@ public class Chain {
 
     public ArrayList<Block> getBlocks() {
         return this.blocks;
-    }
-
-    public String toString() {
-        String chainString = "";
-        for(Block block : blocks) {
-            chainString += "Block n°: " + blocks.indexOf(block) + "\n" +
-                            block.toString() + "\n\n";
-        }
-        return chainString;
-    }
-
-    public void putNewTransaction(Transaction transaction) {
-        for(Map.Entry<String, Miner> entry : Main.miners.entrySet()) {
-            entry.getValue().notify(transaction);
-        }
     }
 
 }
