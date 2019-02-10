@@ -14,10 +14,12 @@ public class TraderTest {
     @Test
     public void TestSendMoney() {
         Trader trader1 = new Trader("trader1", 10);
+        Trader trader2 = new Trader("id123", "trader2", 5);
         Miner miner = new Miner("miner", 5);
-        int initialSize = miner.getNewTransactions().size();
-        trader1.sendMoney("toto12345", 1);
-        assertEquals(initialSize+1, miner.getNewTransactions().size());
+        // miner.createBlock("####");
+        // int initialSize = miner.getCurrentBlock().getTransactions().size();
+        trader1.sendMoney("id123", 1);
+        assertEquals(1, miner.getCurrentBlock().getTransactions().size());
     }
 
 }

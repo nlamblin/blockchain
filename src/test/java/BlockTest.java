@@ -74,7 +74,7 @@ public class BlockTest {
     }
 
     private void addCommonTransactionsToTest() {
-        miner.createBlock("####");
+        miner.createBlock();
         Transaction transaction1 = this.createTransactionToTest(1.1, trader1, trader2, 1549299372);
         Transaction transaction2 = this.createTransactionToTest(0.6, trader2, trader3, 1549299482);
         Transaction transaction3 = this.createTransactionToTest(0.4, trader3, trader1, 1549299494);

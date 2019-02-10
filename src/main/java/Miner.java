@@ -1,44 +1,63 @@
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Random;
 
 public class Miner extends User {
 
     private Block currentBlock;
-    private ArrayList<Transaction> newTransactions;
 
     public Miner(String name, float balance) {
         super(name, balance);
-        this.newTransactions = new ArrayList<>();
     }
 
     public Miner(String id, String name, float balance) {
         super(id, name, balance);
-        this.newTransactions = new ArrayList<>();
+    }
+
+    public void notify(Transaction newTransaction) {
+        if(this.currentBlock == null) this.createBlock();
+        this.validateNewTransaction(newTransaction);
+    }
+
+    public void createBlock() {
+        String previousBlockHash = (Chain.getInstance().getBlocks().isEmpty()) ? "####" : Chain.getInstance().getBlocks().get(Chain.getInstance().getBlocks().size()-1).getHash();
+        this.currentBlock = new Block(previousBlockHash);
+    }
+
+    public void validateNewTransaction(Transaction newTransaction) {
+        if(this.transactionIsValid(newTransaction) && newTransaction.getValidationStatus() == 2) {
+            this.currentBlock.getTransactions().add(newTransaction);
+            if(this.currentBlock.getTransactions().size() == Chain.BLOCK_SIZE) {
+                this.miningProcess();
+            }
+        }
+        else {
+            newTransaction.setValidationStatus(0);
+        }
+    }
+
+    public boolean transactionIsValid(Transaction transactionToValidate) {
+        boolean transactionIsValid = true;
+
+        User sender = Main.traders.get(transactionToValidate.getSender());
+        User receiver = Main.traders.get(transactionToValidate.getReceiver());
+        double amount = transactionToValidate.getAmount();
+
+        if(receiver == null) {
+            transactionIsValid = false;
+        }
+        else if(amount > sender.getBalance()) {
+            transactionIsValid = false;
+        }
+        else if(amount < Chain.MIN_AMOUNT) {
+            transactionIsValid = false;
+        }
+
+        return transactionIsValid;
     }
 
     public void miningProcess() {
-        String previousHash = (Chain.getInstance().getBlocks().isEmpty()) ? "####" : Chain.getInstance().getBlocks().get(Chain.getInstance().getBlocks().size()-1).getHash();
-        this.createBlock(previousHash);
-        ArrayList<Transaction> validatedTransactions = this.validateTransactions();
-        this.addTransactionToBlock(validatedTransactions);
         this.mine();
-        this.newTransactions.clear();
-    }
-
-    public void createBlock(String previousHash) {
-        this.currentBlock = new Block(previousHash);
-    }
-
-    public ArrayList<Transaction> validateTransactions() {
-        ArrayList<Transaction> transationsValidated = new ArrayList<>();
-        for(Transaction transactionChecked : this.newTransactions) {
-            if(transactionChecked.getValidationStatus() == 2 && this.transactionIsValid(transactionChecked)) {
-                transationsValidated.add(transactionChecked);
-            }
-        }
-
-        return transationsValidated;
+        this.currentBlock = null;
     }
 
     public void mine() {
@@ -68,32 +87,6 @@ public class Miner extends User {
         Chain.getInstance().addBlock(this.currentBlock);
     }
 
-    public void addTransactionToBlock(ArrayList<Transaction> transactions) {
-        this.currentBlock.setTransactions(transactions);
-    }
-
-    public boolean transactionIsValid(Transaction transactionToValidate) {
-        boolean transactionIsValid = true;
-
-        User sender = Main.traders.get(transactionToValidate.getSender());
-        User receiver = Main.traders.get(transactionToValidate.getReceiver());
-        double amount = transactionToValidate.getAmount();
-
-        if(receiver == null) {
-            transactionIsValid = false;
-        }
-        else if(amount > sender.getBalance()) {
-            transactionIsValid = false;
-        }
-        else if(amount < Chain.MIN_AMOUNT) {
-            transactionIsValid = false;
-        }
-
-        if(!transactionIsValid) transactionToValidate.setValidationStatus(0);
-
-        return transactionIsValid;
-    }
-
     public boolean chainIsValid() {
         boolean result = true;
         int i = 1;
@@ -105,22 +98,11 @@ public class Miner extends User {
         return result;
     }
 
-    public void notify(Transaction transaction) {
-        this.newTransactions.add(transaction);
-        if(this.newTransactions.size() == Chain.BLOCK_SIZE) {
-            this.miningProcess();
-        }
-    }
-
     public Block getCurrentBlock() {
         return this.currentBlock;
     }
 
     public void setCurrentBlock(Block block) {
         this.currentBlock = block;
-    }
-
-    public ArrayList<Transaction> getNewTransactions() {
-        return this.newTransactions;
     }
 }

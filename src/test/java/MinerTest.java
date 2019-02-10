@@ -97,7 +97,6 @@ public class MinerTest {
 
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -120,55 +119,48 @@ public class MinerTest {
 
     @Before
     public void initTest() {
-        miner.getNewTransactions().clear();
+        // miner.getCurrentBlock().getTransactions().clear();
     }
 
     @Test
     public void TestValidateTransaction_OK() {
         trader1.sendMoney("id123", 1);
-        Transaction transaction = miner.getNewTransactions().get(0);
+        Transaction transaction = miner.getCurrentBlock().getTransactions().get(0);
         assertTrue(miner.transactionIsValid(transaction));
     }
 
     @Test
     public void TestValidateTransaction_OkMin() {
         trader1.sendMoney("id123", 0.1);
-        Transaction transaction = miner.getNewTransactions().get(0);
+        Transaction transaction = miner.getCurrentBlock().getTransactions().get(0);
         assertTrue(miner.transactionIsValid(transaction));
     }
 
     @Test
     public void TestValidateTransaction_ReceiverNotFound() {
-        trader1.sendMoney("id12345", 1);
-        Transaction transaction = miner.getNewTransactions().get(0);
+        Transaction transaction = new Transaction(0.05, "id123", "id12345");
         assertFalse(miner.transactionIsValid(transaction));
-        assertEquals(0, transaction.getValidationStatus());
     }
 
     @Test
     public void TestValidateTransaction_NotEnoughMoney() {
-        trader1.sendMoney("id123", 12);
-        Transaction transaction = miner.getNewTransactions().get(0);
+        Transaction transaction = new Transaction(20, trader1.getId(), "xyz123");
         assertFalse(miner.transactionIsValid(transaction));
-        assertEquals(0, transaction.getValidationStatus());
     }
 
     @Test
     public void TestValidateTransaction_NoMinAmount() {
-        trader1.sendMoney("id123", 0.05);
-        Transaction transaction = miner.getNewTransactions().get(0);
+        Transaction transaction = new Transaction(0.05, "xyz123", "id123");
         assertFalse(miner.transactionIsValid(transaction));
-        assertEquals(0, transaction.getValidationStatus());
     }
 
     @Test
     public void TestMine() {
         int initialSize = Chain.getInstance().getBlocks().size();
+        miner.setCurrentBlock(null);
         trader1.sendMoney("xyz123", 1);
         trader2.sendMoney("xyz123", 2);
 
-        miner.createBlock("####");
-        miner.addTransactionToBlock(miner.getNewTransactions());
         miner.mine();
 
         for(int i = 0; i < Chain.DIFFICULTY; i++) {
@@ -188,8 +180,8 @@ public class MinerTest {
         Transaction transaction2 = new Transaction(0.2, "xyz123", "id123");
         transactions.add(transaction1);
         transactions.add(transaction2);
-        miner.createBlock("####");
-        miner.addTransactionToBlock(transactions);
+        miner.createBlock();
+        miner.getCurrentBlock().setTransactions(transactions);
         assertEquals(miner.getCurrentBlock().getTransactions().size(), transactions.size());
     }
 
