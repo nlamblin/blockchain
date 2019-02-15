@@ -42,8 +42,11 @@ public class GPU implements Runnable{
 	@Override
 	public void run() {
 		running.set(true);
+		System.out.println("(GPU) Mining START");
 		mine();
+		System.out.println("(GPU) "+parent.name+" minage de "+currentBlock+" terminé");
 		parent.miningDone();
+		
 	}
 
 	public void kill() {

@@ -123,34 +123,35 @@ public class Miner extends User implements Runnable{
 		gpuBusy = false;
 	}
 
-	/*
-	 * The miner keep looking for transactions to validate
-	 * The run method is the behaviour of our miner. 
-	 * 	1) If he 
-	 */
 	@Override
 	public void run() {
 		while (true) {
 			if (!gpuBusy) {
-				System.out.println("hey");
 				// looking for transactions
 				try {
 					Transaction newTransaction = Chain.getInstance().getTransactions().pop();
+					System.out.println(name+"is taking care of: "+newTransaction.toString());
 					this.createBlock();
 			        this.validateNewTransaction(newTransaction);
 			        this.miningProcess();
 				}
 				catch (EmptyStackException e) {
 					try {
+						System.out.println(name+": No transactions available: sleeping for a while.");
 						Thread.sleep(5000);
-						// Nothing to mine : better try again
 					} catch (InterruptedException e1) {
 						e1.printStackTrace();
 					}
 				}
 			}
 			else { // Check if this is still relevant to mine
-				System.out.println("Gpu is busy: try again later...");
+				System.out.println(name+" gpu is busy: try again later...");
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 	}
