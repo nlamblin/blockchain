@@ -28,6 +28,9 @@ public class Main {
         trader1.sendMoney(trader3.getPublicKey(), 2.1);
         trader3.sendMoney(trader2.getPublicKey(), 2.2);
 
+        Thread t = new Thread(miner);
+        t.start();
+        
         if(miner.chainIsValid())
             System.out.println(Chain.getInstance().toString());
         else

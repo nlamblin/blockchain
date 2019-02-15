@@ -1,22 +1,18 @@
 import java.security.Signature;
-import java.sql.Timestamp;
 import java.util.Base64;
-import java.util.Random;
+import java.util.EmptyStackException;
 
-public class Miner extends User {
+public class Miner extends User implements Runnable{
 
     private Block currentBlock;
     private GPU gpu;
+    private boolean gpuBusy;
     
     public Miner(String name, float balance) {
         super(name, balance);
+        gpuBusy = false;
     }
 
-    public void notify(Transaction newTransaction) {
-        this.createBlock();
-        this.validateNewTransaction(newTransaction);
-        this.miningProcess();
-    }
 
     public void createBlock() {
         if(this.currentBlock == null) {
@@ -76,7 +72,10 @@ public class Miner extends User {
     public void miningProcess() {
         if(this.currentBlock.getTransactions().size() == Chain.BLOCK_SIZE) {
             GPU gpu = new GPU(currentBlock,this);
-        	gpu.mine();
+        	//gpu.mine();
+            gpuBusy = true;
+            Thread t = new Thread(gpu);
+			t.start();
             Chain.getInstance().getBlocks().add(this.currentBlock);
             this.currentBlock = null;
         }
@@ -118,6 +117,42 @@ public class Miner extends User {
 
 	public void setGpu(GPU gpu) {
 		this.gpu = gpu;
+	}
+
+	public void miningDone() {
+		gpuBusy = false;
+	}
+
+	/*
+	 * The miner keep looking for transactions to validate
+	 * The run method is the behaviour of our miner. 
+	 * 	1) If he 
+	 */
+	@Override
+	public void run() {
+		while (true) {
+			if (!gpuBusy) {
+				System.out.println("hey");
+				// looking for transactions
+				try {
+					Transaction newTransaction = Chain.getInstance().getTransactions().pop();
+					this.createBlock();
+			        this.validateNewTransaction(newTransaction);
+			        this.miningProcess();
+				}
+				catch (EmptyStackException e) {
+					try {
+						Thread.sleep(5000);
+						// Nothing to mine : better try again
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
+				}
+			}
+			else { // Check if this is still relevant to mine
+				System.out.println("Gpu is busy: try again later...");
+			}
+		}
 	}
     
 }

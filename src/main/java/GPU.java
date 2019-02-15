@@ -1,5 +1,6 @@
 import java.sql.Timestamp;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /*
  * Class used to compute hash
@@ -8,6 +9,7 @@ public class GPU implements Runnable{
 	
 	Block currentBlock;
 	Miner parent;	
+	private final AtomicBoolean running = new AtomicBoolean(false);
 	
 	public GPU(Block currentBlock, Miner parent) {
 		super();
@@ -39,6 +41,12 @@ public class GPU implements Runnable{
 
 	@Override
 	public void run() {
+		running.set(true);
 		mine();
+		parent.miningDone();
+	}
+
+	public void kill() {
+		running.set(false);
 	}
 }
