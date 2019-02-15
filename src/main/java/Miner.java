@@ -6,7 +6,8 @@ import java.util.Random;
 public class Miner extends User {
 
     private Block currentBlock;
-
+    private GPU gpu;
+    
     public Miner(String name, float balance) {
         super(name, balance);
     }
@@ -74,33 +75,14 @@ public class Miner extends User {
 
     public void miningProcess() {
         if(this.currentBlock.getTransactions().size() == Chain.BLOCK_SIZE) {
-            this.mine();
+            GPU gpu = new GPU(currentBlock,this);
+        	gpu.mine();
             Chain.getInstance().getBlocks().add(this.currentBlock);
             this.currentBlock = null;
         }
     }
 
-    public void mine() {
-        String hash = "";
-        int nonce;
-        boolean found = false;
-        this.currentBlock.createMerkleTree();
-        while(!found) {
-            Random random = new Random();
-            nonce = random.nextInt(Integer.MAX_VALUE);
-            this.currentBlock.setTimestamp(new Timestamp(System.currentTimeMillis()));
-            this.currentBlock.setNonce(nonce);
-            hash = this.currentBlock.generateHash();
-            if(hash.substring(0, Chain.DIFFICULTY).matches("^[0]{"+ Chain.DIFFICULTY+"}$")) { // hash must starts by at least DIFFICULTY of 0
-                found = true;
-            }
-        }
-        for(Transaction transaction : this.currentBlock.getTransactions()) {
-            exchangeMoney(transaction);
-            transaction.setValidationStatus(1);
-        }
-        this.currentBlock.setHash(hash);
-    }
+    
 
     public void exchangeMoney(Transaction transaction) {
         User sender = Main.traders.get(transaction.getSender());
@@ -129,4 +111,13 @@ public class Miner extends User {
     public void setCurrentBlock(Block block) {
         this.currentBlock = block;
     }
+
+	public GPU getGpu() {
+		return gpu;
+	}
+
+	public void setGpu(GPU gpu) {
+		this.gpu = gpu;
+	}
+    
 }

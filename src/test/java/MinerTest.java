@@ -86,7 +86,8 @@ public class MinerTest {
     public void TestMine() {
         trader1.sendMoney(trader3.getPublicKey(), 1);
         trader2.sendMoney(trader3.getPublicKey(), 2);
-        miner.mine();
+        miner.setGpu(new GPU(miner.getCurrentBlock(),miner));
+        miner.getGpu().mine();
         for(int i = 0; i < Chain.DIFFICULTY; i++) {
             assertEquals(miner.getCurrentBlock().getHash().charAt(i), '0');
         }

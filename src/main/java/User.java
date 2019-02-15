@@ -6,6 +6,7 @@ public class User {
     protected double balance;
     protected PublicKey publicKey;
     protected PrivateKey privateKey;
+    protected GPU gpu;
 
     public User(String name, double balance) {
         this.name = name;
