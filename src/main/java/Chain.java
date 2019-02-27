@@ -7,18 +7,18 @@ public class Chain {
 
     private static Chain chain = null;
     private ArrayList<Block> blocks;
-    public static final int DIFFICULTY = 3;
+    public static final int DIFFICULTY = 2;
     public static final int BLOCK_SIZE = 4;
     public static final double MIN_AMOUNT = 0.1;
-    private Stack<Transaction> transactions;
-
+    
     private Chain() {
         this.blocks = new ArrayList<Block>();
-        this.transactions = new Stack<Transaction>();
     }
 
-    public void putNewTransaction(Transaction transaction) {
-        transactions.push(transaction);
+    public synchronized void putNewTransaction(Transaction transaction) {
+        for(Map.Entry<PublicKey, Miner> entry : Main.miners.entrySet()) {
+            entry.getValue().notify(transaction);
+        }
     }
 
     public String toString() {
@@ -45,9 +45,6 @@ public class Chain {
         return this.blocks;
     }
 
-	public Stack<Transaction> getTransactions() {
-		return transactions;
-	}
 
     
 }

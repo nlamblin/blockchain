@@ -12,6 +12,7 @@ public class Main {
         Trader trader2 = new Trader("trader2", 60);
         Trader trader3 = new Trader("trader3", 30);
         Miner miner = new Miner("miner", 1);
+        Miner miner2 = new Miner("miner2", 1);
 
         trader1.sendMoney(trader2.getPublicKey(), 2);
         trader2.sendMoney(trader1.getPublicKey(), 0.5);
@@ -28,13 +29,15 @@ public class Main {
         trader1.sendMoney(trader3.getPublicKey(), 2.1);
         trader3.sendMoney(trader2.getPublicKey(), 2.2);
 
-        System.out.println(Chain.getInstance().getTransactions().size());
         Thread t = new Thread(miner);
         t.start();
-        
+        Thread t2 = new Thread(miner2);
+        t2.start();
+        /*
         if(miner.chainIsValid())
             System.out.println(Chain.getInstance().toString());
         else
             System.out.println("Chain is not valid !");
+         */
     }
 }

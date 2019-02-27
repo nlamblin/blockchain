@@ -129,11 +129,7 @@ public class Miner extends User implements Runnable{
 			if (!gpuBusy) {
 				// looking for transactions
 				try {
-					Transaction newTransaction = Chain.getInstance().getTransactions().pop();
-					System.out.println(name+"is taking care of: "+newTransaction.toString());
-					this.createBlock();
-			        this.validateNewTransaction(newTransaction);
-			        this.miningProcess();
+					Thread.yield();
 				}
 				catch (EmptyStackException e) {
 					try {
@@ -154,6 +150,13 @@ public class Miner extends User implements Runnable{
 				}
 			}
 		}
+	}
+
+
+	public void notify(Transaction transaction) {
+		this.createBlock();
+        this.validateNewTransaction(transaction);
+        this.miningProcess();
 	}
     
 }
