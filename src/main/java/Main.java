@@ -18,7 +18,7 @@ public class Main {
         trader2.sendMoney(trader1.getPublicKey(), 0.5);
         trader1.sendMoney(trader3.getPublicKey(), 1);
         trader3.sendMoney(trader2.getPublicKey(), 1.2);
-
+        /*
         trader1.sendMoney(trader2.getPublicKey(), 2.8);
         trader2.sendMoney(trader1.getPublicKey(), 0.4);
         trader1.sendMoney(trader3.getPublicKey(), 1.9);
@@ -28,11 +28,12 @@ public class Main {
         trader2.sendMoney(trader1.getPublicKey(), 0.7);
         trader1.sendMoney(trader3.getPublicKey(), 2.1);
         trader3.sendMoney(trader2.getPublicKey(), 2.2);
-
+        */
         Thread t = new Thread(miner);
         t.start();
         Thread t2 = new Thread(miner2);
         t2.start();
+        
         /*
         if(miner.chainIsValid())
             System.out.println(Chain.getInstance().toString());

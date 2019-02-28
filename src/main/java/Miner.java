@@ -71,7 +71,7 @@ public class Miner extends User implements Runnable{
 
     public void miningProcess() {
         if(this.currentBlock.getTransactions().size() == Chain.BLOCK_SIZE) {
-            GPU gpu = new GPU(currentBlock,this);
+            gpu = new GPU(currentBlock,this);
         	//gpu.mine();
             gpuBusy = true;
             Thread t = new Thread(gpu);
@@ -157,6 +157,14 @@ public class Miner extends User implements Runnable{
 		this.createBlock();
         this.validateNewTransaction(transaction);
         this.miningProcess();
+	}
+
+
+	public void stopGPU() {
+		System.out.println("(miner) "+name+": je tue mon GPU");
+		gpu.kill();
+		gpu.currentBlock = null;
+		this.gpuBusy = false;
 	}
     
 }

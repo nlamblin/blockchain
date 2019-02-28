@@ -45,6 +45,13 @@ public class Chain {
         return this.blocks;
     }
 
+    public void blockSolved(User u) {
+    	System.out.println(u.getName()+ "solved the current block. Killing the other GPUs.");
+    	for(Map.Entry<PublicKey, Miner> entry : Main.miners.entrySet()) {
+    		if (u.getPublicKey() != entry.getKey())
+    			entry.getValue().stopGPU();
+        }
+    }
 
     
 }
