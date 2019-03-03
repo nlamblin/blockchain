@@ -164,7 +164,7 @@ public class Miner extends User implements Runnable{
 		System.out.println("(miner) "+name+": je tue mon GPU");
 		gpu.kill();
 		gpu.currentBlock = null;
-		this.gpuBusy = false;
+		this.gpuBusy = false;	
 	}
     
 }

@@ -18,8 +18,8 @@ public class Main {
         trader2.sendMoney(trader1.getPublicKey(), 0.5);
         trader1.sendMoney(trader3.getPublicKey(), 1);
         trader3.sendMoney(trader2.getPublicKey(), 1.2);
-        /*
-        trader1.sendMoney(trader2.getPublicKey(), 2.8);
+        
+  /*      trader1.sendMoney(trader2.getPublicKey(), 2.8);
         trader2.sendMoney(trader1.getPublicKey(), 0.4);
         trader1.sendMoney(trader3.getPublicKey(), 1.9);
         trader3.sendMoney(trader2.getPublicKey(), 1.3);
@@ -28,12 +28,20 @@ public class Main {
         trader2.sendMoney(trader1.getPublicKey(), 0.7);
         trader1.sendMoney(trader3.getPublicKey(), 2.1);
         trader3.sendMoney(trader2.getPublicKey(), 2.2);
-        */
+*/
         Thread t = new Thread(miner);
         t.start();
         Thread t2 = new Thread(miner2);
         t2.start();
+        // pb: Les blocks sont minés par les mineurs, ils s'arrêtent pas 
         
+        try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        System.out.println(Chain.getInstance().toString());
         /*
         if(miner.chainIsValid())
             System.out.println(Chain.getInstance().toString());

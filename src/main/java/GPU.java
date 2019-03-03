@@ -47,11 +47,11 @@ public class GPU implements Runnable{
 			running.set(true);
 			System.out.println("(GPU) Mining START");
 			mine();
-			System.out.println("(GPU) "+parent.name+" minage de "+currentBlock.getHash()+" terminé");
+			//System.out.println("(GPU) "+parent.name+" minage de "+currentBlock.getHash()+" terminé");
 			parent.miningDone();
 		}
 		catch (NullPointerException e) {
-			System.out.println();
+			System.out.println("(GPU) "+parent.name+" Mining aborted ");
 		}	
 		
 	}
