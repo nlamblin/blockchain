@@ -1,11 +1,12 @@
 import java.sql.Timestamp;
 import java.util.Random;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /*
  * Class used to compute hash
  */
-public class GPU implements Runnable{
+public class GPU implements Callable{
 	
 	Block currentBlock;
 	Miner parent;	
@@ -18,7 +19,7 @@ public class GPU implements Runnable{
 	}
 
 	public void mine() {
-        String hash = "";
+		String hash = "";
         int nonce;
         boolean found = false;
         this.currentBlock.createMerkleTree();
@@ -40,12 +41,12 @@ public class GPU implements Runnable{
     }
 
 	@Override
-	public void run() {
+	public GPU call() {
 		running.set(true);
 		System.out.println("(GPU) Mining START");
 		mine();
 		System.out.println("(GPU) "+parent.name+" minage de "+currentBlock+" terminé");
-		parent.miningDone();
+		return this;
 		
 	}
 

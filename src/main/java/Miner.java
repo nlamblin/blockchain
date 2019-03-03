@@ -1,16 +1,19 @@
 import java.security.Signature;
 import java.util.Base64;
 import java.util.EmptyStackException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
-public class Miner extends User implements Runnable{
+public class Miner extends User implements Callable{
 
     private Block currentBlock;
     private GPU gpu;
-    private boolean gpuBusy;
+    private ExecutorService executor;
     
     public Miner(String name, float balance) {
         super(name, balance);
-        gpuBusy = false;
     }
 
 
@@ -69,16 +72,24 @@ public class Miner extends User implements Runnable{
         return transactionIsValid;
     }
 
-    public void miningProcess() {
-        if(this.currentBlock.getTransactions().size() == Chain.BLOCK_SIZE) {
-            GPU gpu = new GPU(currentBlock,this);
-        	//gpu.mine();
-            gpuBusy = true;
-            Thread t = new Thread(gpu);
-			t.start();
-            Chain.getInstance().getBlocks().add(this.currentBlock);
-            this.currentBlock = null;
+    public Miner call() {
+        while(this.currentBlock.getTransactions().size() <= Chain.BLOCK_SIZE) {
+        	Thread.yield(); // 
         }
+        gpu = new GPU(currentBlock,this);
+        executor = Executors.newSingleThreadExecutor();
+        Future<GPU> f = executor.submit(gpu);
+        while (!f.isDone()) {
+        	if (executor.isShutdown()) {
+        		f.cancel(false);
+        		System.out.println("Cancelled:  "+name);
+        	}
+        }
+        if (f.isCancelled()) {
+            Chain.getInstance().getBlocks().add(this.currentBlock);
+        }
+        this.currentBlock = null; 
+		return this;
     }
 
     
@@ -119,44 +130,16 @@ public class Miner extends User implements Runnable{
 		this.gpu = gpu;
 	}
 
-	public void miningDone() {
-		gpuBusy = false;
-	}
-
-	@Override
-	public void run() {
-		while (true) {
-			if (!gpuBusy) {
-				// looking for transactions
-				try {
-					Thread.yield();
-				}
-				catch (EmptyStackException e) {
-					try {
-						System.out.println(name+": No transactions available: sleeping for a while.");
-						Thread.sleep(5000);
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
-					}
-				}
-			}
-			else { // Check if this is still relevant to mine
-				System.out.println(name+" gpu is busy: try again later...");
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
 
 	public void notify(Transaction transaction) {
 		this.createBlock();
         this.validateNewTransaction(transaction);
-        this.miningProcess();
+        //this.miningProcess();
+	}
+
+
+	public ExecutorService getExecutor() {
+		return executor;
 	}
     
 }

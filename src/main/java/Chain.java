@@ -7,7 +7,7 @@ public class Chain {
 
     private static Chain chain = null;
     private ArrayList<Block> blocks;
-    public static final int DIFFICULTY = 2;
+    public static final int DIFFICULTY = 3;
     public static final int BLOCK_SIZE = 4;
     public static final double MIN_AMOUNT = 0.1;
     

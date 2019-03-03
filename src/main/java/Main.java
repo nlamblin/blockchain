@@ -1,6 +1,13 @@
 import java.security.PublicKey;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 
 public class Main {
 
@@ -29,15 +36,35 @@ public class Main {
         trader1.sendMoney(trader3.getPublicKey(), 2.1);
         trader3.sendMoney(trader2.getPublicKey(), 2.2);
 
-        Thread t = new Thread(miner);
-        t.start();
-        Thread t2 = new Thread(miner2);
-        t2.start();
-        /*
+    	List<Callable<Miner>> miners;
+    	ExecutorService executorServiceMiners; 
+    	List<Callable<Miner>> minersEnCours;
+    	executorServiceMiners = Executors.newFixedThreadPool(2); // Pool d'users
+		
+		miners= new ArrayList<>();
+		miners.add(miner);
+		miners.add(miner2);
+		
+		minersEnCours = new ArrayList<Callable<Miner>>(miners);
+		
+		User fini;
+		try {
+			fini = executorServiceMiners.invokeAny(miners);
+			minersEnCours.remove(fini);
+		} catch (InterruptedException | ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} // Appelle la méthode call de tous les users. L'exécution reprend quand l'un d'eux à fini
+		
+		for (Callable<Miner> u : minersEnCours) { // Shutdown des autres utilisateurs en passant par leur exécuteur
+			Miner mu = (Miner)u;
+			mu.getExecutor().shutdownNow();
+		}
+    	
         if(miner.chainIsValid())
-            System.out.println(Chain.getInstance().toString());
+            System.out.println("we did it\n"+Chain.getInstance().toString());
         else
             System.out.println("Chain is not valid !");
-         */
+         
     }
 }
