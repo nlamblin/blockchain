@@ -45,9 +45,7 @@ public class GPU implements Callable{
 		running.set(true);
 		System.out.println("(GPU) Mining START");
 		mine();
-		System.out.println("(GPU) "+parent.name+" minage de "+currentBlock+" terminé");
 		return this;
-		
 	}
 
 	public void kill() {

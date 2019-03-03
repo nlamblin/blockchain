@@ -81,15 +81,23 @@ public class Miner extends User implements Callable{
         Future<GPU> f = executor.submit(gpu);
         while (!f.isDone()) {
         	if (executor.isShutdown()) {
-        		f.cancel(false);
-        		System.out.println("Cancelled:  "+name);
+        		System.out.println(name+": cancelling.");
+        		f.cancel(true);
         	}
         }
-        if (f.isCancelled()) {
-            Chain.getInstance().getBlocks().add(this.currentBlock);
+        if (!f.isCancelled()) {
+        	addBloc();
+        }
+        else {
+        	System.out.println(name+": cancelled.");
         }
         this.currentBlock = null; 
 		return this;
+    }
+    
+    public synchronized void addBloc() {
+    	System.out.println(name+": solved the block. Adding it to the chain...");
+        Chain.getInstance().getBlocks().add(this.currentBlock);
     }
 
     

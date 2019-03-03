@@ -60,11 +60,12 @@ public class Main {
 			Miner mu = (Miner)u;
 			mu.getExecutor().shutdownNow();
 		}
-    	
+		
+		System.out.println("terminé");
         if(miner.chainIsValid())
             System.out.println("we did it\n"+Chain.getInstance().toString());
         else
             System.out.println("Chain is not valid !");
-         
+        
     }
 }
