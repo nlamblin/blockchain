@@ -1,6 +1,9 @@
 import java.security.Signature;
 import java.util.Base64;
 import java.util.EmptyStackException;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -11,9 +14,11 @@ public class Miner extends User implements Callable{
     private Block currentBlock;
     private GPU gpu;
     private ExecutorService executor;
+    private Queue<Transaction> pending;
     
     public Miner(String name, float balance) {
         super(name, balance);
+        pending = new LinkedList<Transaction>();
     }
 
 
@@ -21,12 +26,15 @@ public class Miner extends User implements Callable{
         if(this.currentBlock == null) {
             String previousBlockHash = (Chain.getInstance().getBlocks().isEmpty()) ? "####" : Chain.getInstance().getBlocks().get(Chain.getInstance().getBlocks().size() - 1).getHash();
             this.currentBlock = new Block(previousBlockHash);
+            for (int i = 0 ; i < Chain.BLOCK_SIZE ; i++) {
+            	this.currentBlock.getTransactions().add(pending.poll()); // LIFO on pending transactions 
+            }
         }
     }
 
     public void validateNewTransaction(Transaction newTransaction) {
         if(this.transactionIsValid(newTransaction) && newTransaction.getValidationStatus() == 2) {
-            this.currentBlock.getTransactions().add(newTransaction);
+            this.pending.add(newTransaction);
         }
         else {
             newTransaction.setValidationStatus(0);
@@ -73,9 +81,11 @@ public class Miner extends User implements Callable{
     }
 
     public Miner call() {
-        while(this.currentBlock.getTransactions().size() <= Chain.BLOCK_SIZE) {
+        while(this.pending.size() <= Chain.BLOCK_SIZE) {
         	Thread.yield(); // 
         }
+        
+        createBlock();
         gpu = new GPU(currentBlock,this);
         executor = Executors.newSingleThreadExecutor();
         Future<GPU> f = executor.submit(gpu);
@@ -140,8 +150,9 @@ public class Miner extends User implements Callable{
 
 
 	public void notify(Transaction transaction) {
-		this.createBlock();
+		//this.createBlock();
         this.validateNewTransaction(transaction);
+        pending.add(transaction);
         //this.miningProcess();
 	}
 
