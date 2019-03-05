@@ -1,20 +1,28 @@
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Block {
 
     private String hash;
     private String previousHash;
     private String merkleRootHash;
-    private ArrayList<Transaction> transactions;
+    private List<Transaction> transactions;
     private Timestamp timestamp;
     private int nonce;
     private String parent;
 
-    public Block(String previousHash, String parent) {
+    public Block(String previousHash, String parent, List<Transaction> toExecute) {
         this.previousHash = previousHash;
         this.transactions = new ArrayList<Transaction>();
         this.parent = parent;
+        this.transactions = toExecute;
+    }
+    
+    public Block(Block b) {
+    	this.parent = b.parent; 
+    	this.previousHash = b.previousHash;
+    	this.transactions = b.transactions;
     }
 
     public String generateHash() {
@@ -68,11 +76,11 @@ public class Block {
         this.merkleRootHash = merkleRootHash;
     }
 
-    public ArrayList<Transaction> getTransactions() {
+    public List<Transaction> getTransactions() {
         return transactions;
     }
 
-    public void setTransactions(ArrayList<Transaction> transactions) {
+    public void setTransactions(List<Transaction> transactions) {
         this.transactions = transactions;
     }
 

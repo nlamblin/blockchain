@@ -16,9 +16,7 @@ public class Chain {
     }
 
     public synchronized void putNewTransaction(Transaction transaction) {
-        for(Map.Entry<PublicKey, Miner> entry : Main.miners.entrySet()) {
-            entry.getValue().notify(transaction);
-        }
+       Main.notify(transaction);
     }
 
     public String toString() {
