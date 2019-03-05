@@ -14,7 +14,7 @@ public class Main {
     public static Map<PublicKey, Trader> traders = new HashMap<>();
     public static Map<PublicKey, Miner> miners = new HashMap<>();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         Trader trader1 = new Trader("trader1", 50);
         Trader trader2 = new Trader("trader2", 60);
         Trader trader3 = new Trader("trader3", 30);
@@ -39,17 +39,18 @@ public class Main {
     	List<Callable<Miner>> miners;
     	ExecutorService executorServiceMiners; 
     	List<Callable<Miner>> minersEnCours;
-    	executorServiceMiners = Executors.newFixedThreadPool(2); // Pool d'users
+    	executorServiceMiners = Executors.newFixedThreadPool(3); // Pool d'users
 		
 		miners= new ArrayList<>();
 		miners.add(miner);
 		miners.add(miner2);
 		
 		minersEnCours = new ArrayList<Callable<Miner>>(miners);
+		Miner fini;
 		
-		User fini;
 		try {
 			fini = executorServiceMiners.invokeAny(miners);
+			Chain.getInstance().getBlocks().add(fini.getCurrentBlock());
 			minersEnCours.remove(fini);
 		} catch (InterruptedException | ExecutionException e) {
 			// TODO Auto-generated catch block
@@ -61,11 +62,47 @@ public class Main {
 			mu.getExecutor().shutdownNow();
 		}
 		
-		System.out.println("terminé");
-        if(miner.chainIsValid())
-            System.out.println("we did it\n"+Chain.getInstance().toString());
-        else
-            System.out.println("Chain is not valid !");
+		// R2 
+		try {
+			fini = executorServiceMiners.invokeAny(miners);
+			Chain.getInstance().getBlocks().add(fini.getCurrentBlock());
+			minersEnCours.remove(fini);
+		} catch (InterruptedException | ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} // Appelle la méthode call de tous les users. L'exécution reprend quand l'un d'eux à fini
+		
+		for (Callable<Miner> u : minersEnCours) { // Shutdown des autres utilisateurs en passant par leur exécuteur
+			Miner mu = (Miner)u;
+			mu.getExecutor().shutdownNow();
+		}
+		
+		// R2 
+				try {
+					fini = executorServiceMiners.invokeAny(miners);
+					Chain.getInstance().getBlocks().add(fini.getCurrentBlock());
+					minersEnCours.remove(fini);
+				} catch (InterruptedException | ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} // Appelle la méthode call de tous les users. L'exécution reprend quand l'un d'eux à fini
+				
+				for (Callable<Miner> u : minersEnCours) { // Shutdown des autres utilisateurs en passant par leur exécuteur
+					Miner mu = (Miner)u;
+					mu.getExecutor().shutdownNow();
+				}
+		
+
+		System.out.println(Chain.getInstance().toString());
+		/*if(miner.chainIsValid())
+	            System.out.println(Chain.getInstance().toString());
+	        else
+	            System.out.println("Chain is not valid !");*/
+		shoe();
         
+    }
+    
+    public synchronized static void shoe () {
+    	
     }
 }

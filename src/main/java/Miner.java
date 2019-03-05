@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -25,8 +26,9 @@ public class Miner extends User implements Callable{
     public void createBlock() {
         if(this.currentBlock == null) {
             String previousBlockHash = (Chain.getInstance().getBlocks().isEmpty()) ? "####" : Chain.getInstance().getBlocks().get(Chain.getInstance().getBlocks().size() - 1).getHash();
-            this.currentBlock = new Block(previousBlockHash);
+            this.currentBlock = new Block(previousBlockHash, this.name);
             for (int i = 0 ; i < Chain.BLOCK_SIZE ; i++) {
+            	//System.out.println("adding transaction: "+pending.peek());
             	this.currentBlock.getTransactions().add(pending.poll()); // LIFO on pending transactions 
             }
         }
@@ -96,22 +98,27 @@ public class Miner extends User implements Callable{
         	}
         }
         if (!f.isCancelled()) {
-        	addBloc();
+        	//addBloc(f);
         }
         else {
         	System.out.println(name+": cancelled.");
         }
-        this.currentBlock = null; 
+        //this.currentBlock = null; 
 		return this;
     }
     
-    public synchronized void addBloc() {
-    	System.out.println(name+": solved the block. Adding it to the chain...");
-        Chain.getInstance().getBlocks().add(this.currentBlock);
+    public synchronized void addBloc(Future<GPU> f) {
+    	try {
+
+			Block newBlock = f.get().currentBlock;
+	    	System.out.println(name+": solved the block. Adding it to the chain...");
+	        Chain.getInstance().getBlocks().add(this.currentBlock);
+		} catch (InterruptedException | ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
-
     
-
     public void exchangeMoney(Transaction transaction) {
         User sender = Main.traders.get(transaction.getSender());
         User receiver = Main.traders.get(transaction.getReceiver());
@@ -124,8 +131,12 @@ public class Miner extends User implements Callable{
         boolean result = true;
         int i = 1;
         while(i < Chain.getInstance().getBlocks().size() && result) {
+        	System.out.println("crash possible");
+        	System.out.println("expected size: "+Chain.getInstance().getBlocks().size());
             if (!Chain.getInstance().getBlocks().get(i).getPreviousHash().equals(Chain.getInstance().getBlocks().get(i-1).getHash())) {
                 result = false;
+                System.out.println("Hash annoncé comme précédent: "+Chain.getInstance().getBlocks().get(i-1).getHash());
+                System.out.println("Hash précédent: "+Chain.getInstance().getBlocks().get(i).getPreviousHash());
             }
             i++;
         }
@@ -150,10 +161,7 @@ public class Miner extends User implements Callable{
 
 
 	public void notify(Transaction transaction) {
-		//this.createBlock();
         this.validateNewTransaction(transaction);
-        pending.add(transaction);
-        //this.miningProcess();
 	}
 
 

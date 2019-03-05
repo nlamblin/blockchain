@@ -9,10 +9,12 @@ public class Block {
     private ArrayList<Transaction> transactions;
     private Timestamp timestamp;
     private int nonce;
+    private String parent;
 
-    public Block(String previousHash) {
+    public Block(String previousHash, String parent) {
         this.previousHash = previousHash;
         this.transactions = new ArrayList<Transaction>();
+        this.parent = parent;
     }
 
     public String generateHash() {
@@ -97,10 +99,15 @@ public class Block {
         }
 
         return "\t Hash : " + this.hash + "\n" +
+        		"\t Mined by : " + this.parent + "\n"	+
                 "\t Previous hash : " + this.previousHash + "\n" +
                 "\t Merkle root hash : " + this.merkleRootHash + "\n" +
                 "\t Timestamp : " + this.timestamp + "\n" +
                 "\t Nonce : " + this.nonce + "\n" +
                 "\t Transactions : \n" + transactionsString;
+    }
+    
+    public String getParent() {
+    	return this.parent;
     }
 }
