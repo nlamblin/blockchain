@@ -14,10 +14,10 @@ public class User {
         this.generateKeys();
 
         if(this instanceof Miner) {
-            Main.miners.put(this.publicKey, (Miner) this);
+            Server.miners.put(this.publicKey, (Miner) this);
         }
         else if(this instanceof Trader) {
-            Main.traders.put(this.publicKey, (Trader) this);
+            Server.traders.put(this.publicKey, (Trader) this);
         }
     }
 
