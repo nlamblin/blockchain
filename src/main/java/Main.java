@@ -24,6 +24,8 @@ public class Main {
     public static List<Transaction> currentRound = new ArrayList<>();
 	public static volatile LinkedBlockingQueue<Transaction> pool = new LinkedBlockingQueue<>();
 	static Iterator<Transaction> iterator = pool.iterator();
+	 
+	static List<Callable<Miner>> minersEnCours;
     
     public static void main(String[] args) throws InterruptedException {
         Trader trader1 = new Trader("trader1", 50);
@@ -48,8 +50,7 @@ public class Main {
         trader3.sendMoney(trader2.getPublicKey(), 2.2);
 
     	List<Callable<Miner>> miners;
-    	ExecutorService executorServiceMiners; 
-    	List<Callable<Miner>> minersEnCours;
+    	ExecutorService executorServiceMiners;
     	executorServiceMiners = Executors.newFixedThreadPool(3); // Pool d'users
 		
 		miners= new ArrayList<>();
@@ -122,11 +123,10 @@ public class Main {
 		}
 		
 		try {
-			fini = executorServiceMiners.invokeAny(miners);
-			Block newBlockOnTheBlock = fini.getCurrentBlock();
-			System.out.println("Adding: "+newBlockOnTheBlock);
-			Chain.getInstance().getBlocks().add(fini.getCurrentBlock());
-			minersEnCours.remove(fini);
+
+	    	fini = executorServiceMiners.invokeAny(miners);
+			majChain(fini);
+			
 		} catch (InterruptedException | ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -196,4 +196,11 @@ public class Main {
     public static void notify(Transaction transaction) {
         validateNewTransaction(transaction);
 	}
+    
+    public static synchronized void majChain(Miner fini) {
+		Block newBlockOnTheBlock = fini.getCurrentBlock();
+		System.out.println("Adding: "+newBlockOnTheBlock);
+		Chain.getInstance().getBlocks().add(fini.getCurrentBlock());
+		minersEnCours.remove(fini);
+    }
 }
