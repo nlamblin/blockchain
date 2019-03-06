@@ -75,20 +75,6 @@ public class Miner extends User implements Callable{
         receiver.setBalance(receiver.getBalance()+amount);
     }
 
-    public boolean chainIsValid() {
-        boolean result = true;
-        int i = 1;
-        while(i < Chain.getInstance().getBlocks().size() && result) {
-        	if (!Chain.getInstance().getBlocks().get(i).getPreviousHash().equals(Chain.getInstance().getBlocks().get(i-1).getHash())) {
-                result = false;
-                System.out.println("Hash annoncé comme précédent: "+Chain.getInstance().getBlocks().get(i-1).getHash());
-                System.out.println("Hash précédent: "+Chain.getInstance().getBlocks().get(i).getPreviousHash());
-            }
-            i++;
-        }
-        return result;
-    }
-
     public Block getCurrentBlock() {
         return this.currentBlock;
     }

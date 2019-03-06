@@ -8,8 +8,8 @@ public class TraderTest {
 
     @AfterClass
     public static void clearClass() {
-        Main.traders.clear();
-        Main.miners.clear();
+        Server.traders.clear();
+        Server.miners.clear();
     }
 
     @Test

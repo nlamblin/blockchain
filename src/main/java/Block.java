@@ -24,6 +24,11 @@ public class Block {
     	this.previousHash = b.previousHash;
     	this.transactions = b.transactions;
     }
+    
+    public Block(String previousHash) {
+        this.previousHash = previousHash;
+        this.transactions = new ArrayList<Transaction>();
+    }
 
     public String generateHash() {
         return Tools.applyHash(this.previousHash + this.merkleRootHash + this.timestamp + this.nonce);

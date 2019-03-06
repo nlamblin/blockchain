@@ -7,7 +7,7 @@ public class Chain {
 
     private volatile static Chain chain = null; // volatile for thread safety
     private volatile ArrayList<Block> blocks;
-    public static final int DIFFICULTY = 5;
+    public static final int DIFFICULTY = 4;
     public static final int BLOCK_SIZE = 4;
     public static final double MIN_AMOUNT = 0;
     
@@ -19,6 +19,18 @@ public class Chain {
        Server.notify(transaction);
     }
 
+    public static boolean isValid() {
+        boolean result = true;
+        int i = 1;
+        while(i < Chain.getInstance().getBlocks().size() && result) {
+        	if (!Chain.getInstance().getBlocks().get(i).getPreviousHash().equals(Chain.getInstance().getBlocks().get(i-1).getHash())) {
+                result = false;
+            }
+            i++;
+        }
+        return result;
+    }
+    
     public String toString() {
         String chainString = "";
         for(Block block : blocks) {

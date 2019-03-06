@@ -22,8 +22,8 @@ public class MinerTest {
 
     @AfterClass
     public static void initClass() {
-        Main.traders.clear();
-        Main.miners.clear();
+        Server.traders.clear();
+        Server.miners.clear();
     }
 
     @Before
@@ -36,14 +36,14 @@ public class MinerTest {
     public void TestValidateTransaction_OK() {
         trader1.sendMoney(trader2.getPublicKey(), 1);
         Transaction transaction = miner.getCurrentBlock().getTransactions().get(0);
-        assertTrue(miner.transactionIsValid(transaction));
+        assertTrue(Server.transactionIsValid(transaction));
     }
 
     @Test
     public void TestValidateTransaction_OkMin() {
         trader1.sendMoney(trader2.getPublicKey(), 0.1);
         Transaction transaction = miner.getCurrentBlock().getTransactions().get(0);
-        assertTrue(miner.transactionIsValid(transaction));
+        assertTrue(Server.transactionIsValid(transaction));
     }
 
     @Test
@@ -53,20 +53,20 @@ public class MinerTest {
         String key = this.getNewKey(trader3);
         this.setNewKey(trader3, key);
         Transaction transaction = new Transaction(0.05, trader2.getPublicKey(), oldPublicKey);
-        assertFalse(miner.transactionIsValid(transaction));
+        assertFalse(Server.transactionIsValid(transaction));
         trader3.setPublicKey(oldPublicKey); // restore the initial public key
     }
 
     @Test
     public void TestValidateTransaction_NotEnoughMoney() {
         Transaction transaction = new Transaction(20, trader1.getPublicKey(), trader3.getPublicKey());
-        assertFalse(miner.transactionIsValid(transaction));
+        assertFalse(Server.transactionIsValid(transaction));
     }
 
     @Test
     public void TestValidateTransaction_NoMinAmount() {
         Transaction transaction = new Transaction(0.05, trader3.getPublicKey(), trader2.getPublicKey());
-        assertFalse(miner.transactionIsValid(transaction));
+        assertFalse(Server.transactionIsValid(transaction));
     }
 
     @Test
@@ -77,8 +77,8 @@ public class MinerTest {
         Transaction transaction = new Transaction(1, trader3.getPublicKey(), trader2.getPublicKey());
         trader3.sign(transaction);
         this.setNewKey(trader3, key);
-        assertFalse(miner.verifySignature(transaction));
-        assertFalse(miner.transactionIsValid(transaction));
+        assertFalse(Server.verifySignature(transaction));
+        assertFalse(Server.transactionIsValid(transaction));
         trader3.setPublicKey(oldPublicKey); // restore the initial public key
     }
 
@@ -124,7 +124,7 @@ public class MinerTest {
         miner.createBlock();
         Transaction transaction = new Transaction(2, trader1.getPublicKey(), trader2.getPublicKey());
         trader1.sign(transaction);
-        miner.validateNewTransaction(transaction);
+        Server.validateNewTransaction(transaction);
         assertEquals(1, miner.getCurrentBlock().getTransactions().size());
     }
 
@@ -133,7 +133,7 @@ public class MinerTest {
         miner.createBlock();
         Transaction transaction = new Transaction(200, trader1.getPublicKey(), trader3.getPublicKey());
         trader1.sign(transaction);
-        miner.validateNewTransaction(transaction);
+        Server.validateNewTransaction(transaction);
         assertEquals(0, transaction.getValidationStatus());
         assertEquals(0, miner.getCurrentBlock().getTransactions().size());
     }
@@ -176,7 +176,7 @@ public class MinerTest {
         Block block2 = new Block("758307cc8f73326078d4c793f85fb8cf0606fdc66b95ee2cfb0ca3cce11d333d");
         Chain.getInstance().getBlocks().add(block1);
         Chain.getInstance().getBlocks().add(block2);
-        assertTrue(miner.chainIsValid());
+        assertTrue(Chain.isValid());
     }
 
     @Test
@@ -186,13 +186,13 @@ public class MinerTest {
         Block block2 = new Block("23d57d98c4abb9d264c094161d50056f4f37be8f59bb769f10e4307aa551fcfe");
         Chain.getInstance().getBlocks().add(block1);
         Chain.getInstance().getBlocks().add(block2);
-        assertFalse(miner.chainIsValid());
+        assertFalse(Chain.isValid());
     }
 
     @Test
     public void TestVerifySignature_OK() {
         trader1.sendMoney(trader2.getPublicKey(), 1);
-        assertTrue(miner.verifySignature(miner.getCurrentBlock().getTransactions().get(0)));
+        assertTrue(Server.verifySignature(miner.getCurrentBlock().getTransactions().get(0)));
     }
 
     private String getNewKey(User user) {

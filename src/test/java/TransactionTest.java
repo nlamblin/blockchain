@@ -10,8 +10,8 @@ public class TransactionTest {
 
     @AfterClass
     public static void initClass() {
-        Main.traders.clear();
-        Main.miners.clear();
+        Server.traders.clear();
+        Server.miners.clear();
     }
 
     @Test
