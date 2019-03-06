@@ -20,8 +20,7 @@ public class GPU implements Callable{
 
 	public void mine() {
 		
-        System.out.println("début met minage");
-		String hash = "";
+        String hash = "";
         int nonce;
         boolean found = false;
         
@@ -51,9 +50,7 @@ public class GPU implements Callable{
 	@Override
 	public GPU call() {
 		running.set(true);
-		System.out.println("(GPU) Mining START");
 		mine();
-		System.out.println("(GPU)"+parent.name+": work done. Block is: "+currentBlock);
 		parent.setCurrentBlock(currentBlock);
 		return this;
 	}

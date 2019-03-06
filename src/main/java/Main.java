@@ -22,7 +22,6 @@ public class Main {
     public static Map<PublicKey, Trader> traders = new HashMap<>();
     public static Map<PublicKey, Miner> miners = new HashMap<>();
     public static List<Transaction> currentRound = new ArrayList<>();
-
 	public static volatile LinkedBlockingQueue<Transaction> pool = new LinkedBlockingQueue<>();
 	static Iterator<Transaction> iterator = pool.iterator();
     
@@ -32,7 +31,7 @@ public class Main {
         Trader trader3 = new Trader("trader3", 30);
         Miner miner = new Miner("miner", 1);
         Miner miner2 = new Miner("miner2", 1);
-
+        Chain c = Chain.getInstance();
         trader1.sendMoney(trader2.getPublicKey(), 2);
         trader2.sendMoney(trader1.getPublicKey(), 0.5);
         trader1.sendMoney(trader3.getPublicKey(), 1);
@@ -70,7 +69,6 @@ public class Main {
 		try {
 			fini = executorServiceMiners.invokeAny(miners);
 			Block newBlockOnTheBlock = fini.getCurrentBlock();
-			System.out.println("Adding: "+newBlockOnTheBlock);
 			Chain.getInstance().getBlocks().add(fini.getCurrentBlock());
 			minersEnCours.remove(fini);
 		} catch (InterruptedException | ExecutionException e) {
@@ -86,6 +84,7 @@ public class Main {
 		/*
 		 * Changin da pool
 		 */
+		
 		miner.getToExecute().clear();
 		miner2.getToExecute().clear();
 		
@@ -138,10 +137,11 @@ public class Main {
 			mu.getExecutor().shutdownNow();
 		}
 		
+
 		if(miner.chainIsValid())
-	            System.out.println(Chain.getInstance().toString());
-        else
-            System.out.println("Chain is not valid !");
+            System.out.println(Chain.getInstance().toString());
+	    else
+	        System.out.println("Chain is not valid !");
 		
 		
         

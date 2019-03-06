@@ -35,7 +35,7 @@ public class Miner extends User implements Callable{
     public void createBlock() {
         String previousBlockHash = (Chain.getInstance().getBlocks().isEmpty()) ? "####" : Chain.getInstance().getBlocks().get(Chain.getInstance().getBlocks().size() - 1).getHash();
         
-        this.currentBlock = new Block(previousBlockHash, this.name, toExecute);
+        this.currentBlock = new Block(previousBlockHash, this.name, new LinkedList<Transaction>(toExecute));
         
     } 
     
@@ -50,23 +50,9 @@ public class Miner extends User implements Callable{
         Future<GPU> f = executor.submit(gpu);
         while (!f.isDone()) {
         	if (executor.isShutdown()) {
-        		System.out.println(name+": cancelling.");
         		f.cancel(false);
         	}
         }
-        if (f.isCancelled()) {
-        	System.out.println(name+": cancelled.");
-        }
-        
-        else {
-        	try {
-				System.out.println(name+": adding: "+currentBlock);
-			} catch (Exception e) {
-				// TODO Auto-generaMinerted catch block
-				e.printStackTrace();
-			}
-        }
-        
 		return this;
     }
     
@@ -74,8 +60,7 @@ public class Miner extends User implements Callable{
     	try {
 
 			Block newBlock = f.get().currentBlock;
-	    	System.out.println(name+": solved the block. Adding it to the chain...");
-	        Chain.getInstance().getBlocks().add(this.currentBlock);
+	    	Chain.getInstance().getBlocks().add(this.currentBlock);
 		} catch (InterruptedException | ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -94,8 +79,7 @@ public class Miner extends User implements Callable{
         boolean result = true;
         int i = 1;
         while(i < Chain.getInstance().getBlocks().size() && result) {
-        	System.out.println("expected size: "+Chain.getInstance().getBlocks().size());
-            if (!Chain.getInstance().getBlocks().get(i).getPreviousHash().equals(Chain.getInstance().getBlocks().get(i-1).getHash())) {
+        	if (!Chain.getInstance().getBlocks().get(i).getPreviousHash().equals(Chain.getInstance().getBlocks().get(i-1).getHash())) {
                 result = false;
                 System.out.println("Hash annoncé comme précédent: "+Chain.getInstance().getBlocks().get(i-1).getHash());
                 System.out.println("Hash précédent: "+Chain.getInstance().getBlocks().get(i).getPreviousHash());
