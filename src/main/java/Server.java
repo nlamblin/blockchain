@@ -3,13 +3,9 @@ import java.security.Signature;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -57,22 +53,16 @@ public class Server {
 		int j = 0 ; 
 		while (j < 6) {
 			try {
-				fini = executorServiceMiners.invokeAny(callableMiners);
+				fini = executorServiceMiners.invokeAny(callableMiners); // Appelle la méthode call de tous les users. L'exécution reprend quand l'un d'eux à fini
 				Block newBlockOnTheBlock = fini.getCurrentBlock();
 				Chain.getInstance().getBlocks().add(fini.getCurrentBlock());
 				minersEnCours.remove(fini);
 			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
-			} // Appelle la méthode call de tous les users. L'exécution reprend quand l'un d'eux à fini
+			} 
 			
-			/*for (Callable<Miner> u : minersEnCours) { // Shutdown des autres utilisateurs en passant par leur exécuteur
-				Miner mu = (Miner)u;
-				mu.getExecutor().shutdownNow();
-			}
-			for (Callable<Miner> u : minersEnCours) { // Shutdown des autres utilisateurs en passant par leur exécuteur
-				((Miner) u).getToExecute().clear();
-			}*/
-			for (Callable<Miner> u : callableMiners) { // Shutdown des autres utilisateurs en passant par leur exécuteur
+			
+			for (Callable<Miner> u : callableMiners) { 
 				((Miner) u).getToExecute().clear();
 			}
 			sendTransactions();
