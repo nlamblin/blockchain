@@ -8,9 +8,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class GPU implements Callable{
 	
-	Block currentBlock;
-	volatile Miner parent;	
-	private final AtomicBoolean running = new AtomicBoolean(false);
+	private Block currentBlock;
+	private volatile Miner parent;	
 	
 	public GPU(Block currentBlock, Miner parent) {
 		super();
@@ -43,19 +42,24 @@ public class GPU implements Callable{
             transaction.setValidationStatus(1);
         }
         this.currentBlock.setHash(hash);
-
-        
     }
 
 	@Override
 	public GPU call() {
-		running.set(true);
 		mine();
 		parent.setCurrentBlock(currentBlock);
 		return this;
 	}
 
-	public void kill() {
-		running.set(false);
+	public Block getCurrentBlock() {
+		return currentBlock;
 	}
+
+	public Miner getParent() {
+		return parent;
+	}
+	
+	
+	
+	
 }

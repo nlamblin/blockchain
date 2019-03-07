@@ -74,7 +74,6 @@ public class Server {
 			}*/
 			for (Callable<Miner> u : callableMiners) { // Shutdown des autres utilisateurs en passant par leur exécuteur
 				((Miner) u).getToExecute().clear();
-				System.out.println(((Miner) u).getToExecute());
 			}
 			sendTransactions();
 			

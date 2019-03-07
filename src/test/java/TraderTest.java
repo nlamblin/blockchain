@@ -18,8 +18,11 @@ public class TraderTest {
         Trader trader2 = new Trader("trader2", 5);
         Miner miner = new Miner("miner", 5);
         trader1.sendMoney(trader2.getPublicKey(), 1);
-        assertEquals(1, miner.getCurrentBlock().getTransactions().size());
-        assertNotNull(miner.getCurrentBlock().getTransactions().get(0).getSignature());
+        
+        
+        
+        assertEquals(1, Server.pool.size());
+        assertNotNull(Server.pool.poll().getSignature());
     }
 
 }

@@ -9,7 +9,7 @@ public class Chain {
     private volatile ArrayList<Block> blocks;
     public static final int DIFFICULTY = 4;
     public static final int BLOCK_SIZE = 4;
-    public static final double MIN_AMOUNT = 0;
+    public static final double MIN_AMOUNT = 0.1;
     
     private Chain() {
         this.blocks = new ArrayList<Block>();

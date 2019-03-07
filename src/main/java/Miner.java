@@ -17,7 +17,6 @@ public class Miner extends User implements Callable{
     private Block currentBlock;
     private GPU gpu;
     private ExecutorService executor;
-    private Queue<Transaction> pending;
     private List<Transaction> toExecute;
     
     public List<Transaction> getToExecute() {
@@ -27,7 +26,6 @@ public class Miner extends User implements Callable{
 
 	public Miner(String name, float balance) {
         super(name, balance);
-        pending = new LinkedList<Transaction>();
         toExecute = new ArrayList<Transaction>();
 	}
 
@@ -38,11 +36,8 @@ public class Miner extends User implements Callable{
     } 
     
     public Miner call() {
-    	
-        createBlock();
+    	createBlock();
         //Transactions supposées vérifiées rajoutées par la chaîne
-        
-        
         gpu = new GPU(currentBlock,this);
         executor = Executors.newSingleThreadExecutor();
         Future<GPU> f = executor.submit(gpu);
@@ -57,7 +52,7 @@ public class Miner extends User implements Callable{
     public synchronized void addBloc(Future<GPU> f) {
     	try {
 
-			Block newBlock = f.get().currentBlock;
+			Block newBlock = f.get().getCurrentBlock();
 	    	Chain.getInstance().getBlocks().add(this.currentBlock);
 		} catch (InterruptedException | ExecutionException e) {
 			// TODO Auto-generated catch block

@@ -20,6 +20,7 @@ public class MinerTest {
     private static Trader trader3 = new Trader("trader3", 2);
     private static Miner miner = new Miner("miner", 1);
 
+    
     @AfterClass
     public static void initClass() {
         Server.traders.clear();
@@ -35,14 +36,14 @@ public class MinerTest {
     @Test
     public void TestValidateTransaction_OK() {
         trader1.sendMoney(trader2.getPublicKey(), 1);
-        Transaction transaction = miner.getCurrentBlock().getTransactions().get(0);
+        Transaction transaction = Server.pool.poll();
         assertTrue(Server.transactionIsValid(transaction));
     }
 
     @Test
     public void TestValidateTransaction_OkMin() {
         trader1.sendMoney(trader2.getPublicKey(), 0.1);
-        Transaction transaction = miner.getCurrentBlock().getTransactions().get(0);
+        Transaction transaction = Server.pool.poll();
         assertTrue(Server.transactionIsValid(transaction));
     }
 
@@ -86,10 +87,13 @@ public class MinerTest {
     public void TestMine() {
         trader1.sendMoney(trader3.getPublicKey(), 1);
         trader2.sendMoney(trader3.getPublicKey(), 2);
+        miner.getToExecute().add(Server.pool.poll());
+        miner.getToExecute().add(Server.pool.poll());
+        miner.createBlock();
         miner.setGpu(new GPU(miner.getCurrentBlock(),miner));
         miner.getGpu().mine();
         for(int i = 0; i < Chain.DIFFICULTY; i++) {
-            assertEquals(miner.getCurrentBlock().getHash().charAt(i), '0');
+            assertEquals(miner.getGpu().getCurrentBlock().getHash().charAt(i), '0');
         }
     }
 
@@ -152,7 +156,7 @@ public class MinerTest {
         for(int i = 0; i < Chain.BLOCK_SIZE; i++) {
             miner.getCurrentBlock().getTransactions().add(new Transaction(0.2, trader3.getPublicKey(), trader2.getPublicKey()));
         }
-        miner.miningProcess();
+        //miner.miningProcess();
         assertEquals(1, Chain.getInstance().getBlocks().size());
         assertNull(miner.getCurrentBlock());
     }
@@ -163,8 +167,8 @@ public class MinerTest {
         for(int i = 0; i < Chain.BLOCK_SIZE - 1; i++) {
             miner.getCurrentBlock().getTransactions().add(new Transaction(0.2, trader1.getPublicKey(), trader2.getPublicKey()));
         }
-        miner.miningProcess();
-        miner.miningProcess();
+        /*miner.miningProcess();
+        miner.miningProcess();*/
         assertEquals(0, Chain.getInstance().getBlocks().size());
         assertNotNull(miner.getCurrentBlock());
     }
@@ -192,7 +196,7 @@ public class MinerTest {
     @Test
     public void TestVerifySignature_OK() {
         trader1.sendMoney(trader2.getPublicKey(), 1);
-        assertTrue(Server.verifySignature(miner.getCurrentBlock().getTransactions().get(0)));
+        assertTrue(Server.verifySignature(Server.pool.poll()));
     }
 
     private String getNewKey(User user) {
