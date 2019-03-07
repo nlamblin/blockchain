@@ -1,13 +1,11 @@
 import java.sql.Timestamp;
 import java.util.Random;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /*
  * Class used to compute hash
  */
 public class GPU implements Callable{
-	
 	private Block currentBlock;
 	private volatile Miner parent;	
 	
@@ -46,8 +44,11 @@ public class GPU implements Callable{
 
 	@Override
 	public GPU call() {
+		final long startTime = System.currentTimeMillis();
 		mine();
 		parent.setCurrentBlock(currentBlock);
+		final long endTime = System.currentTimeMillis();
+		currentBlock.setTimeToMine(endTime - startTime);
 		return this;
 	}
 

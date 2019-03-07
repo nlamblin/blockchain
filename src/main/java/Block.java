@@ -10,6 +10,7 @@ public class Block {
     private List<Transaction> transactions;
     private Timestamp timestamp;
     private int nonce;
+    private long timeToMine;
     private String parent;
 
     public Block(String previousHash, String parent, List<Transaction> toExecute) {
@@ -104,6 +105,18 @@ public class Block {
     public void setNonce(int nonce) {
         this.nonce = nonce;
     }
+    
+    public String getParent() {
+    	return this.parent;
+    }
+
+	public void setTimeToMine(long l) {
+		this.timeToMine = l;
+	}
+	
+	public long getTimeToMine() {
+		return this.timeToMine;
+	}
 
     public String toString() {
         String transactionsString = "";
@@ -112,15 +125,13 @@ public class Block {
         }
 
         return "\t Hash : " + this.hash + "\n" +
-        		"\t Mined by : " + this.parent + "\n"	+
                 "\t Previous hash : " + this.previousHash + "\n" +
+        		"\t Mined by : " + this.parent + " in " + this.timeToMine+ "ms \n"	+
                 "\t Merkle root hash : " + this.merkleRootHash + "\n" +
                 "\t Timestamp : " + this.timestamp + "\n" +
                 "\t Nonce : " + this.nonce + "\n" +
                 "\t Transactions : \n" + transactionsString;
     }
     
-    public String getParent() {
-    	return this.parent;
-    }
+
 }
