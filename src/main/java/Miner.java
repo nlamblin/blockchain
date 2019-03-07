@@ -34,9 +34,7 @@ public class Miner extends User implements Callable{
 
     public void createBlock() {
         String previousBlockHash = (Chain.getInstance().getBlocks().isEmpty()) ? "####" : Chain.getInstance().getBlocks().get(Chain.getInstance().getBlocks().size() - 1).getHash();
-        
         this.currentBlock = new Block(previousBlockHash, this.name, new LinkedList<Transaction>(toExecute));
-        
     } 
     
     public Miner call() {
