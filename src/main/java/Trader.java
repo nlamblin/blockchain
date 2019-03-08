@@ -8,10 +8,11 @@ public class Trader extends User {
         super(name, balance);
     }
 
-    public void sendMoney(PublicKey receiverKey, double amount) {
+    public Transaction sendMoney(PublicKey receiverKey, double amount) {
         Transaction transaction = new Transaction(amount, this.publicKey, receiverKey);
         this.sign(transaction);
         Chain.getInstance().putNewTransaction(transaction);
+        return transaction;
     }
 
     public void sign(Transaction transaction) {
