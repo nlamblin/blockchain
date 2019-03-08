@@ -15,11 +15,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class Server {
 
-    public static Map<PublicKey, Trader> traders = new HashMap<>();
-    public static Map<PublicKey, Miner> miners = new HashMap<>();
-    public static List<Transaction> currentRound = new ArrayList<>();
+    public static volatile Map<PublicKey, Trader> traders = new HashMap<>();
+    public static volatile Map<PublicKey, Miner> miners = new HashMap<>();
 	public static volatile LinkedBlockingQueue<Transaction> pool = new LinkedBlockingQueue<>();
-	static Iterator<Transaction> iterator = pool.iterator();
 	 
 	static List<Callable<Miner>> minersEnCours;
     
@@ -37,6 +35,9 @@ public class Server {
         Chain c = Chain.getInstance();
         
         trade();
+        Thread t = new Thread(new TransactionGenerator());
+        t.start();
+        
         callableMiners.add(miner);
         callableMiners.add(miner2);
         callableMiners.add(miner3);
@@ -47,12 +48,15 @@ public class Server {
 		minersEnCours = new ArrayList<Callable<Miner>>(callableMiners);
 		
 		Miner fini;
-		sendTransactions();
 
 		// Serveur loop
 		int j = 0 ; 
-		while (j < 6) {
+		LinkedBlockingQueue<Transaction> pool = Server.pool;
+		while (true) {
 			try {
+				while (pool.size() < Chain.BLOCK_SIZE) 
+					Thread.yield();
+				sendTransactions();
 				fini = executorServiceMiners.invokeAny(callableMiners); // Appelle la méthode call de tous les users. L'exécution reprend quand l'un d'eux à fini
 				Block newBlockOnTheBlock = fini.getCurrentBlock();
 				Chain.getInstance().getBlocks().add(fini.getCurrentBlock());
@@ -65,16 +69,14 @@ public class Server {
 			for (Callable<Miner> u : callableMiners) { 
 				((Miner) u).getToExecute().clear();
 			}
-			sendTransactions();
-			
 		j++; // incrementing j variable by one
+		
+			if(Chain.isValid())
+	            System.out.println(Chain.getInstance().toString());
+		    else
+		        System.out.println("Chain is not valid !");
 		}
 
-		if(Chain.isValid())
-            System.out.println(Chain.getInstance().toString());
-	    else
-	        System.out.println("Chain is not valid !");
-	   
     }
 
     public static void validateNewTransaction(Transaction newTransaction) {
@@ -149,6 +151,7 @@ public class Server {
         Trader trader2 = new Trader("trader2", 60);
         Trader trader3 = new Trader("trader3", 30);
         
+        /*
     	trader1.sendMoney(trader2.getPublicKey(), 2);
         trader2.sendMoney(trader1.getPublicKey(), 0.5);
         trader1.sendMoney(trader3.getPublicKey(), 1);
@@ -178,5 +181,6 @@ public class Server {
         trader2.sendMoney(trader1.getPublicKey(), 0.7);
         trader1.sendMoney(trader3.getPublicKey(), 0.1);
         trader3.sendMoney(trader2.getPublicKey(), 0.2);
+        */
     }
 }
