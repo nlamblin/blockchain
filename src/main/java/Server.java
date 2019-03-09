@@ -71,10 +71,10 @@ public class Server {
 			}
 		j++; // incrementing j variable by one
 		
-			if(Chain.isValid())
+			/*if(Chain.isValid())
 	            System.out.println(Chain.getInstance().toString());
 		    else
-		        System.out.println("Chain is not valid !");
+		        System.out.println("Chain is not valid !");*/
 		}
 
     }

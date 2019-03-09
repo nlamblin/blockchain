@@ -6,8 +6,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class TransactionGenerator implements Runnable{
 
 	private Trader sender,receiver;
-	public static final double MAX_PROPORTION = 0.15; //Max amount a trader will send 
-	public static final double MIN_PROPORTION = 0.05;
+	public static final double MAX_PROPORTION = 0.55; //Max amount a trader will send 
+	public static final double MIN_PROPORTION = 0.45;
 	public static final int DELAY_BETWEEN_TRANSACTIONS = 1000; // Time in ms 
 	public static AtomicBoolean running;
 	
@@ -48,8 +48,19 @@ public class TransactionGenerator implements Runnable{
 	public Transaction createTransaction() {
 		double fondAvantCrash = sender.getBalance();
 		double proportion = ThreadLocalRandom.current().nextDouble(MIN_PROPORTION, MAX_PROPORTION);
+		
+		if (sender.getBalance()*proportion > sender.getBalance()) {
+			System.out.println("pas assez de sous");
+			return null;
+		}
+		
+		if (sender.getBalance()*proportion < 0)
+			System.out.println("mais comment????");
+		
 		sender.sendMoney(receiver.getPublicKey(), sender.getBalance()*proportion);
 		double fondApresCrash = sender.getBalance();
+		if (sender.getBalance()*proportion < 0)
+			System.out.println("mais comment????");
 		
 		return new Transaction(sender.getBalance()*proportion, sender.getPublicKey(), receiver.getPublicKey());
 	}
