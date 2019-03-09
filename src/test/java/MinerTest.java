@@ -9,6 +9,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
@@ -146,7 +147,9 @@ public class MinerTest {
     @Test
     public void TestExchangeMoney() {
         Transaction transaction = new Transaction(1, trader1.getPublicKey(), trader2.getPublicKey());
-        miner.exchangeMoney(transaction);
+        List<Transaction> t = new ArrayList<Transaction>();
+        t.add(transaction);
+        Server.exchangeMoney(t);
         assertEquals(9, trader1.getBalance(), 0.0);
         assertEquals(6, trader2.getBalance(), 0.0);
     }

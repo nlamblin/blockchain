@@ -46,22 +46,11 @@ public class TransactionGenerator implements Runnable{
 	}
 	
 	public Transaction createTransaction() {
-		double fondAvantCrash = sender.getBalance();
 		double proportion = ThreadLocalRandom.current().nextDouble(MIN_PROPORTION, MAX_PROPORTION);
-		
 		if (sender.getBalance()*proportion > sender.getBalance()) {
-			System.out.println("pas assez de sous");
 			return null;
 		}
-		
-		if (sender.getBalance()*proportion < 0)
-			System.out.println("mais comment????");
-		
 		sender.sendMoney(receiver.getPublicKey(), sender.getBalance()*proportion);
-		double fondApresCrash = sender.getBalance();
-		if (sender.getBalance()*proportion < 0)
-			System.out.println("mais comment????");
-		
 		return new Transaction(sender.getBalance()*proportion, sender.getPublicKey(), receiver.getPublicKey());
 	}
 	
@@ -71,7 +60,6 @@ public class TransactionGenerator implements Runnable{
 	public synchronized void go(){
 		shuffle();
 		Transaction t = createTransaction();
-		System.out.println("added "+t);
 	}
 
 	public Trader getSender() {
