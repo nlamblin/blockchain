@@ -9,7 +9,7 @@ public class TransactionGenerator implements Runnable{
 	public static final double MAX_PROPORTION = 0.15; //Max amount a trader will send 
 	public static final double MIN_PROPORTION = 0.05;
 	public static final int DELAY_BETWEEN_TRANSACTIONS = 1000; // Time in ms 
-	public static AtomicBoolean running;
+	private static boolean isRunning;
 	
 	public TransactionGenerator() {
 		super();
@@ -17,8 +17,8 @@ public class TransactionGenerator implements Runnable{
 	
 	@Override
 	public void run() {
-		running = new AtomicBoolean(true);
-		while (true) {
+		isRunning = true;
+		while (isRunning) {
 			go();
 			try {
 				Thread.sleep(DELAY_BETWEEN_TRANSACTIONS);
@@ -27,10 +27,6 @@ public class TransactionGenerator implements Runnable{
 				e.printStackTrace();
 			}
 		}
-	}
-	
-	public void kill() {
-		this.running.set(false);
 	}
 	
 	public void shuffle() {
@@ -75,6 +71,16 @@ public class TransactionGenerator implements Runnable{
 	public void setReceiver(Trader receiver) {
 		this.receiver = receiver;
 	}
+
+	public static boolean getIsRunning() {
+		return isRunning;
+	}
+
+	public static void setIsRunning(boolean isRunning) {
+		TransactionGenerator.isRunning = isRunning;
+	}
+	
+	
 	
 	
 	

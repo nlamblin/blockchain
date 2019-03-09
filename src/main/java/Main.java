@@ -21,6 +21,12 @@ public class Main {
 
 	
     public static void main(String[] args) throws InterruptedException {
-        Server.go();
+        Server s = new Server();
+        Server.init();
+        Thread main = new Thread(s);
+        main.start();
+        
+        Thread.sleep(5000);
+        s.setRunning(false);
     }
 }

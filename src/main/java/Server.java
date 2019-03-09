@@ -1,5 +1,9 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.security.PublicKey;
 import java.security.Signature;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -12,53 +16,56 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 
-public class Server {
+public class Server implements Runnable{
 
     public static volatile Map<PublicKey, Trader> traders = new HashMap<>();
     public static volatile Map<PublicKey, Miner> miners = new HashMap<>();
 	public static volatile LinkedBlockingQueue<Transaction> pool = new LinkedBlockingQueue<>();
 	public static List<Callable<Miner>> callableMiners;
 	public static ExecutorService executorServiceMiners;
+	private static boolean isRunning;
+	private PrintWriter writer;
 	
 	static List<Callable<Miner>> minersEnCours;
     
-    public static void go() throws InterruptedException {
+    public static void init() {
     	Chain c = Chain.getInstance();
         initTraders();
         initMiners();
-		Miner firstMiner;
-
-		// Serveur loop
-		int blocNo = 0 ; 
-		LinkedBlockingQueue<Transaction> pool = Server.pool;
-		while (true) {
-			try {
-				while (pool.size() < Chain.BLOCK_SIZE) 
-					Thread.yield();
-				sendTransactions();
-				firstMiner = executorServiceMiners.invokeAny(callableMiners); // Appelle la méthode call de tous les users. L'exécution reprend quand l'un d'eux à fini
-				Block newBlockOnTheBlock = firstMiner.getCurrentBlock();
-				exchangeMoney(newBlockOnTheBlock.getTransactions());
-				Chain.getInstance().getBlocks().add(firstMiner.getCurrentBlock());
-				minersEnCours.remove(firstMiner);
-			} catch (InterruptedException | ExecutionException e) {
-				e.printStackTrace();
-			} 
-			
-			
-			for (Callable<Miner> u : callableMiners) { 
-				((Miner) u).getToExecute().clear();
-			}
-		blocNo++; // incrementing variable blocNo by one
-			if(Chain.isValid())
-	            System.out.println(Chain.getInstance().toString());
-		    else
-		        System.out.println("Chain is not valid !");
-		}
-
+        initCsv();
+        isRunning = true;
     }
+    
+    
+    
+    public boolean isRunning() {
+		return isRunning;
+	}
 
-    public static void exchangeMoney(List<Transaction> transactions) {
+
+
+	public void setRunning(boolean isRunning) {
+		this.isRunning = isRunning;
+	}
+
+
+
+	private static void initCsv() {
+    	try {
+    		LocalDateTime ldt = LocalDateTime.now();
+    		int j = ldt.getDayOfMonth();
+    		int h = ldt.getHour();
+    		int m = ldt.getMinute();
+    		int s = ldt.getSecond();
+			PrintWriter writer = new PrintWriter(new File("src/main/resources/"+s+".csv"));
+			writer.write("chausson");
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public static void exchangeMoney(List<Transaction> transactions) {
     	for (Transaction transaction: transactions) {
     		User sender = Server.traders.get(transaction.getSender());
 	        User receiver = Server.traders.get(transaction.getReceiver());
@@ -167,6 +174,38 @@ public class Server {
 		callableMiners.add(miner4);
 		executorServiceMiners = Executors.newFixedThreadPool(callableMiners.size()); // Pool d'users
 		minersEnCours = new ArrayList<Callable<Miner>>(callableMiners);
-
     }
+
+	@Override
+	public void run() {
+		Miner firstMiner;		
+		int blocNo = 0 ; 
+		LinkedBlockingQueue<Transaction> pool = Server.pool;
+		while (isRunning) {
+			try {
+				while (pool.size() < Chain.BLOCK_SIZE) 
+					Thread.yield();
+				sendTransactions();
+				firstMiner = executorServiceMiners.invokeAny(callableMiners); // Appelle la méthode call de tous les users. L'exécution reprend quand l'un d'eux à fini
+				Block newBlockOnTheBlock = firstMiner.getCurrentBlock();
+				exchangeMoney(newBlockOnTheBlock.getTransactions());
+				Chain.getInstance().getBlocks().add(firstMiner.getCurrentBlock());
+				minersEnCours.remove(firstMiner);
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+			} 
+			
+			
+			for (Callable<Miner> u : callableMiners) { 
+				((Miner) u).getToExecute().clear();
+			}
+			blocNo++; // incrementing variable blocNo by one
+			
+		}
+		TransactionGenerator.setIsRunning(false);
+		if(Chain.isValid())
+            System.out.println(Chain.getInstance().toString());
+	    else
+	        System.out.println("Chain is not valid !");
+	}
 }
