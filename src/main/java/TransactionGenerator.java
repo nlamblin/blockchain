@@ -6,8 +6,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class TransactionGenerator implements Runnable{
 
 	private Trader sender,receiver;
-	public static final double MAX_PROPORTION = 0.55; //Max amount a trader will send 
-	public static final double MIN_PROPORTION = 0.45;
+	public static final double MAX_PROPORTION = 0.15; //Max amount a trader will send 
+	public static final double MIN_PROPORTION = 0.05;
 	public static final int DELAY_BETWEEN_TRANSACTIONS = 1000; // Time in ms 
 	public static AtomicBoolean running;
 	
@@ -34,14 +34,11 @@ public class TransactionGenerator implements Runnable{
 	}
 	
 	public void shuffle() {
-		try {
-			ArrayList<Trader> a = new ArrayList<Trader>(Server.traders.values());
-			Collections.shuffle(a);
-			sender = a.get(0);
-			receiver = a.get(1);
-		}
-		catch (IndexOutOfBoundsException e) {
-			System.out.println("Not enough traders for a transaction to take place.");
+		ArrayList<Trader> localTraders = new ArrayList<Trader>(Server.traders.values());
+		if (localTraders.size() > 1) {
+			Collections.shuffle(localTraders);
+			sender = localTraders.get(0);
+			receiver = localTraders.get(1);
 		}
 	}
 	
@@ -60,6 +57,7 @@ public class TransactionGenerator implements Runnable{
 	public synchronized void go(){
 		shuffle();
 		Transaction t = createTransaction();
+		System.out.println("added "+t);
 	}
 
 	public Trader getSender() {

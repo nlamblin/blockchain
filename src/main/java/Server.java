@@ -50,7 +50,6 @@ public class Server {
 				((Miner) u).getToExecute().clear();
 			}
 		blocNo++; // incrementing variable blocNo by one
-		
 			if(Chain.isValid())
 	            System.out.println(Chain.getInstance().toString());
 		    else
@@ -60,10 +59,8 @@ public class Server {
     }
 
     public static void exchangeMoney(List<Transaction> transactions) {
-    	System.out.println(transactions.size());
     	for (Transaction transaction: transactions) {
-    		System.out.println("transaction prise en compte. "+transactions.indexOf(transaction));
-	        User sender = Server.traders.get(transaction.getSender());
+    		User sender = Server.traders.get(transaction.getSender());
 	        User receiver = Server.traders.get(transaction.getReceiver());
 	        double amount = transaction.getAmount();
 	        sender.setBalance(sender.getBalance()-amount);
@@ -143,6 +140,7 @@ public class Server {
         Trader trader2 = new Trader("trader2", 60);
         Trader trader3 = new Trader("trader3", 30);
         
+        
     	trader1.sendMoney(trader2.getPublicKey(), 2);
         trader2.sendMoney(trader1.getPublicKey(), 0.5);
         trader1.sendMoney(trader3.getPublicKey(), 1);
@@ -169,5 +167,6 @@ public class Server {
 		callableMiners.add(miner4);
 		executorServiceMiners = Executors.newFixedThreadPool(callableMiners.size()); // Pool d'users
 		minersEnCours = new ArrayList<Callable<Miner>>(callableMiners);
+
     }
 }

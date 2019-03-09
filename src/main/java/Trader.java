@@ -9,7 +9,7 @@ public class Trader extends User {
     }
 
     public Transaction sendMoney(PublicKey receiverKey, double amount) {
-    	Transaction transaction = new Transaction(amount, this.publicKey, receiverKey);
+        Transaction transaction = new Transaction(amount, this.publicKey, receiverKey);
         this.sign(transaction);
         Chain.getInstance().putNewTransaction(transaction);
         return transaction;
