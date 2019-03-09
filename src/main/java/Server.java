@@ -18,49 +18,30 @@ public class Server {
     public static volatile Map<PublicKey, Trader> traders = new HashMap<>();
     public static volatile Map<PublicKey, Miner> miners = new HashMap<>();
 	public static volatile LinkedBlockingQueue<Transaction> pool = new LinkedBlockingQueue<>();
-	 
+	public static List<Callable<Miner>> callableMiners;
+	public static ExecutorService executorServiceMiners;
+	
 	static List<Callable<Miner>> minersEnCours;
     
     public static void go() throws InterruptedException {
-    	List<Callable<Miner>> callableMiners;
-    	ExecutorService executorServiceMiners;
-    	
-    	callableMiners= new ArrayList<>();
-		
-    	Miner miner = new Miner("miner", 1);
-        Miner miner2 = new Miner("miner2", 1);
-        Miner miner3 = new Miner("miner3", 1);
-        Miner miner4 = new Miner("miner4", 1);
-        
-        Chain c = Chain.getInstance();
-        
-        trade();
-        Thread t = new Thread(new TransactionGenerator());
-        t.start();
-        
-        callableMiners.add(miner);
-        callableMiners.add(miner2);
-        callableMiners.add(miner3);
-		callableMiners.add(miner4);
-		executorServiceMiners = Executors.newFixedThreadPool(callableMiners.size()); // Pool d'users
-		
-		
-		minersEnCours = new ArrayList<Callable<Miner>>(callableMiners);
-		
-		Miner fini;
+    	Chain c = Chain.getInstance();
+        initTraders();
+        initMiners();
+		Miner firstMiner;
 
 		// Serveur loop
-		int j = 0 ; 
+		int blocNo = 0 ; 
 		LinkedBlockingQueue<Transaction> pool = Server.pool;
 		while (true) {
 			try {
 				while (pool.size() < Chain.BLOCK_SIZE) 
 					Thread.yield();
 				sendTransactions();
-				fini = executorServiceMiners.invokeAny(callableMiners); // Appelle la méthode call de tous les users. L'exécution reprend quand l'un d'eux à fini
-				Block newBlockOnTheBlock = fini.getCurrentBlock();
-				Chain.getInstance().getBlocks().add(fini.getCurrentBlock());
-				minersEnCours.remove(fini);
+				firstMiner = executorServiceMiners.invokeAny(callableMiners); // Appelle la méthode call de tous les users. L'exécution reprend quand l'un d'eux à fini
+				Block newBlockOnTheBlock = firstMiner.getCurrentBlock();
+				exchangeMoney(newBlockOnTheBlock.getTransactions());
+				Chain.getInstance().getBlocks().add(firstMiner.getCurrentBlock());
+				minersEnCours.remove(firstMiner);
 			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
 			} 
@@ -69,17 +50,27 @@ public class Server {
 			for (Callable<Miner> u : callableMiners) { 
 				((Miner) u).getToExecute().clear();
 			}
-		j++; // incrementing j variable by one
+		blocNo++; // incrementing variable blocNo by one
 		
-			/*if(Chain.isValid())
+			if(Chain.isValid())
 	            System.out.println(Chain.getInstance().toString());
 		    else
-		        System.out.println("Chain is not valid !");*/
+		        System.out.println("Chain is not valid !");
 		}
 
     }
 
-    public static void validateNewTransaction(Transaction newTransaction) {
+    public static void exchangeMoney(List<Transaction> transactions) {
+    	for (Transaction transaction: transactions) {
+	        User sender = Server.traders.get(transaction.getSender());
+	        User receiver = Server.traders.get(transaction.getReceiver());
+	        double amount = transaction.getAmount();
+	        sender.setBalance(sender.getBalance()-amount);
+	        receiver.setBalance(receiver.getBalance()+amount);
+    	}
+    }
+
+	public static void validateNewTransaction(Transaction newTransaction) {
         if(transactionIsValid(newTransaction) && newTransaction.getValidationStatus() == 2) {
             Server.pool.add(newTransaction);
         }
@@ -146,12 +137,11 @@ public class Server {
 		}
     }
     
-    public static void trade() {
+    public static void initTraders() {
     	Trader trader1 = new Trader("trader1", 50);
         Trader trader2 = new Trader("trader2", 60);
         Trader trader3 = new Trader("trader3", 30);
         
-        /*
     	trader1.sendMoney(trader2.getPublicKey(), 2);
         trader2.sendMoney(trader1.getPublicKey(), 0.5);
         trader1.sendMoney(trader3.getPublicKey(), 1);
@@ -161,26 +151,22 @@ public class Server {
         trader2.sendMoney(trader1.getPublicKey(), 0.4);
         trader1.sendMoney(trader3.getPublicKey(), 1.9);
         trader3.sendMoney(trader2.getPublicKey(), 1.3);
-
-        trader1.sendMoney(trader2.getPublicKey(), 4.6);
-        trader2.sendMoney(trader1.getPublicKey(), 0.7);
-        trader1.sendMoney(trader3.getPublicKey(), 2.1);
-        trader3.sendMoney(trader2.getPublicKey(), 2.2);
         
-        trader1.sendMoney(trader2.getPublicKey(), 0.2);
-        trader2.sendMoney(trader1.getPublicKey(), 0.5);
-        trader1.sendMoney(trader3.getPublicKey(), 0.1);
-        trader3.sendMoney(trader2.getPublicKey(), 0.2);
-
-        trader1.sendMoney(trader2.getPublicKey(), 0.8);
-        trader2.sendMoney(trader1.getPublicKey(), 0.4);
-        trader1.sendMoney(trader3.getPublicKey(), 0.9);
-        trader3.sendMoney(trader2.getPublicKey(), 0.3);
-
-        trader1.sendMoney(trader2.getPublicKey(), 0.6);
-        trader2.sendMoney(trader1.getPublicKey(), 0.7);
-        trader1.sendMoney(trader3.getPublicKey(), 0.1);
-        trader3.sendMoney(trader2.getPublicKey(), 0.2);
-        */
+        Thread t = new Thread(new TransactionGenerator());
+        t.start();
+    }
+    
+    public static void initMiners() {
+    	Miner miner = new Miner("miner", 1);
+        Miner miner2 = new Miner("miner2", 1);
+        Miner miner3 = new Miner("miner3", 1);
+        Miner miner4 = new Miner("miner4", 1);
+    	callableMiners= new ArrayList<>();
+        callableMiners.add(miner);
+        callableMiners.add(miner2);
+        callableMiners.add(miner3);
+		callableMiners.add(miner4);
+		executorServiceMiners = Executors.newFixedThreadPool(callableMiners.size()); // Pool d'users
+		minersEnCours = new ArrayList<Callable<Miner>>(callableMiners);
     }
 }

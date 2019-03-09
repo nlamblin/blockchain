@@ -60,14 +60,6 @@ public class Miner extends User implements Callable{
 		}
     }
     
-    public void exchangeMoney(Transaction transaction) {
-        User sender = Server.traders.get(transaction.getSender());
-        User receiver = Server.traders.get(transaction.getReceiver());
-        double amount = transaction.getAmount();
-        sender.setBalance(sender.getBalance()-amount);
-        receiver.setBalance(receiver.getBalance()+amount);
-    }
-
     public Block getCurrentBlock() {
         return this.currentBlock;
     }

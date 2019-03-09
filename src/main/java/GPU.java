@@ -36,7 +36,6 @@ public class GPU implements Callable{
             
         }
         for(Transaction transaction : this.currentBlock.getTransactions()) {
-            parent.exchangeMoney(transaction);
             transaction.setValidationStatus(1);
         }
         this.currentBlock.setHash(hash);
