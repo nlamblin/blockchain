@@ -30,9 +30,6 @@ public class Server implements Runnable{
     
     public static void init() {
     	Chain c = Chain.getInstance();
-        initTraders();
-        initMiners();
-        initCsv();
         isRunning = true;
     }
     
@@ -46,24 +43,7 @@ public class Server implements Runnable{
 
 	public void setRunning(boolean isRunning) {
 		this.isRunning = isRunning;
-	}
-
-
-
-	private static void initCsv() {
-    	try {
-    		LocalDateTime ldt = LocalDateTime.now();
-    		int j = ldt.getDayOfMonth();
-    		int h = ldt.getHour();
-    		int m = ldt.getMinute();
-    		int s = ldt.getSecond();
-			PrintWriter writer = new PrintWriter(new File("src/main/resources/"+s+".csv"));
-			writer.write("chausson");
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+	}	
 
 	public static void exchangeMoney(List<Transaction> transactions) {
     	for (Transaction transaction: transactions) {
@@ -140,40 +120,6 @@ public class Server implements Runnable{
 				entry.getValue().getToExecute().add(t);
 	        }
 		}
-    }
-    
-    public static void initTraders() {
-    	Trader trader1 = new Trader("trader1", 50);
-        Trader trader2 = new Trader("trader2", 60);
-        Trader trader3 = new Trader("trader3", 30);
-        
-        
-    	trader1.sendMoney(trader2.getPublicKey(), 2);
-        trader2.sendMoney(trader1.getPublicKey(), 0.5);
-        trader1.sendMoney(trader3.getPublicKey(), 1);
-        trader3.sendMoney(trader2.getPublicKey(), 1.2);
-
-        trader1.sendMoney(trader2.getPublicKey(), 2.8);
-        trader2.sendMoney(trader1.getPublicKey(), 0.4);
-        trader1.sendMoney(trader3.getPublicKey(), 1.9);
-        trader3.sendMoney(trader2.getPublicKey(), 1.3);
-        
-        Thread t = new Thread(new TransactionGenerator());
-        t.start();
-    }
-    
-    public static void initMiners() {
-    	Miner miner = new Miner("miner", 1);
-        Miner miner2 = new Miner("miner2", 1);
-        Miner miner3 = new Miner("miner3", 1);
-        Miner miner4 = new Miner("miner4", 1);
-    	callableMiners= new ArrayList<>();
-        callableMiners.add(miner);
-        callableMiners.add(miner2);
-        callableMiners.add(miner3);
-		callableMiners.add(miner4);
-		executorServiceMiners = Executors.newFixedThreadPool(callableMiners.size()); // Pool d'users
-		minersEnCours = new ArrayList<Callable<Miner>>(callableMiners);
     }
 
 	@Override

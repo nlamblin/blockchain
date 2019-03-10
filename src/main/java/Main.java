@@ -19,14 +19,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class Main {
 
+	public static final int TIME_TO_RUN = 5000;
 	
     public static void main(String[] args) throws InterruptedException {
         Server s = new Server();
         Server.init();
+        DataFiller.fill();
         Thread main = new Thread(s);
         main.start();
         
-        Thread.sleep(5000);
+        Thread.sleep(TIME_TO_RUN);
         s.setRunning(false);
     }
 }
