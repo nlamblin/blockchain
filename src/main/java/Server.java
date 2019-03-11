@@ -18,13 +18,15 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class Server implements Runnable{
 
+	public int TARGET_BLOCK_TIME; // bitcoin : 10min
+	public int TARGET_NO_BLOCK; //144
     public static volatile Map<PublicKey, Trader> traders = new HashMap<>();
     public static volatile Map<PublicKey, Miner> miners = new HashMap<>();
 	public static volatile LinkedBlockingQueue<Transaction> pool = new LinkedBlockingQueue<>();
 	public static List<Callable<Miner>> callableMiners;
 	public static ExecutorService executorServiceMiners;
 	private static boolean isRunning;
-	private PrintWriter writer;
+	public static PrintWriter writer;
 	
 	static List<Callable<Miner>> minersEnCours;
     
@@ -33,18 +35,6 @@ public class Server implements Runnable{
         isRunning = true;
     }
     
-    
-    
-    public boolean isRunning() {
-		return isRunning;
-	}
-
-
-
-	public void setRunning(boolean isRunning) {
-		this.isRunning = isRunning;
-	}	
-
 	public static void exchangeMoney(List<Transaction> transactions) {
     	for (Transaction transaction: transactions) {
     		User sender = Server.traders.get(transaction.getSender());
@@ -145,13 +135,31 @@ public class Server implements Runnable{
 			for (Callable<Miner> u : callableMiners) { 
 				((Miner) u).getToExecute().clear();
 			}
-			blocNo++; // incrementing variable blocNo by one
+			blocNo++; // increments variable blocNo by one
 			
 		}
+	}
+	
+	public static void adjustDifficulty() {
+		
+	}
+
+
+	/*
+	 * Code to run when server shut down is called.
+	 */
+	public static void serverShutdown() {
 		TransactionGenerator.setIsRunning(false);
 		if(Chain.isValid())
-            System.out.println(Chain.getInstance().toString());
+            writer.write(Chain.getInstance().toString());
 	    else
 	        System.out.println("Chain is not valid !");
+		writer.close();
 	}
+	
+
+	public static void setRunning(boolean isRunning) {
+		Server.isRunning = isRunning;
+	}	
+
 }
