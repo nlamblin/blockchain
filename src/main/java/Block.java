@@ -12,7 +12,13 @@ public class Block {
     private int nonce;
     private long timeToMine;
     private String parent;
+    private int difficulty;
 
+    public Block(String previousHash, String parent, List<Transaction> toExecute, int difficulty) {
+    	this(previousHash, parent, toExecute);
+    	this.difficulty=difficulty;
+    }
+    
     public Block(String previousHash, String parent, List<Transaction> toExecute) {
         this.previousHash = previousHash;
         this.transactions = new ArrayList<Transaction>();
@@ -132,6 +138,11 @@ public class Block {
                 "\t Nonce : " + this.nonce + "\n" +
                 "\t Transactions : \n" + transactionsString;
     }
+
+	public int getDifficulty() {
+		return difficulty;
+	}
+    
     
 
 }

@@ -1,3 +1,4 @@
+
 import java.security.PublicKey;
 import java.security.Signature;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -19,7 +21,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class Main {
 
-	public static final int TIME_TO_RUN = 5000;
+	public static final int TIME_TO_RUN = 600000;
 	
     public static void main(String[] args) throws InterruptedException {
         Server s = new Server();
@@ -28,7 +30,9 @@ public class Main {
         Thread main = new Thread(s);
         main.start();
         
-        Thread.sleep(TIME_TO_RUN);
+        Scanner sc = new Scanner(System.in);
+        sc.nextInt();
+        System.out.println("shutting down");
         s.setRunning(false);
     }
 }

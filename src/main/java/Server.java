@@ -5,7 +5,10 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,12 +17,20 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 public class Server implements Runnable{
 
-	public int TARGET_BLOCK_TIME; // bitcoin : 10min
-	public int TARGET_NO_BLOCK; //144
+	public static final int TARGET_BLOCK_TIME = 60; // Every 60s we want a new block
+	public static final int TARGET_NO_BLOCK = 10; // Every ten block we adjust
+	public static final int ESTIMATED_ELAPSED_TIME_BLOCK = TARGET_BLOCK_TIME * TARGET_NO_BLOCK; // there should be 600s between intervals
+	public static final int MAX_MINERS = 10;
+	public static final int MIN_MINERS = 2;
+	public final static int MAX_INCREASE_COEF=4;
+	public final static double MIN_DECREASE_COEF=0.25;
+	
+	
     public static volatile Map<PublicKey, Trader> traders = new HashMap<>();
     public static volatile Map<PublicKey, Miner> miners = new HashMap<>();
 	public static volatile LinkedBlockingQueue<Transaction> pool = new LinkedBlockingQueue<>();
@@ -27,9 +38,8 @@ public class Server implements Runnable{
 	public static ExecutorService executorServiceMiners;
 	private static boolean isRunning;
 	public static PrintWriter writer;
+	private int blocNo;
 	
-	static List<Callable<Miner>> minersEnCours;
-    
     public static void init() {
     	Chain c = Chain.getInstance();
         isRunning = true;
@@ -96,11 +106,10 @@ public class Server implements Runnable{
         validateNewTransaction(transaction);
 	}
     
-    public static synchronized void majChain(Miner fini) {
-		Block newBlockOnTheBlock = fini.getCurrentBlock();
+    public static synchronized void majChain(Miner winner) {
+		Block newBlockOnTheBlock = winner.getCurrentBlock();
 		System.out.println("Adding: "+newBlockOnTheBlock);
-		Chain.getInstance().getBlocks().add(fini.getCurrentBlock());
-		minersEnCours.remove(fini);
+		Chain.getInstance().getBlocks().add(winner.getCurrentBlock());
     }
     
     public static void sendTransactions() {
@@ -115,18 +124,20 @@ public class Server implements Runnable{
 	@Override
 	public void run() {
 		Miner firstMiner;		
-		int blocNo = 0 ; 
+		blocNo = 0 ; 
 		LinkedBlockingQueue<Transaction> pool = Server.pool;
 		while (isRunning) {
 			try {
 				while (pool.size() < Chain.BLOCK_SIZE) 
 					Thread.yield();
+				if (blocNo % TARGET_NO_BLOCK == 0 && blocNo >= 10 ) // every TARGET_NO_BLOCK ew adjust difficulty
+					adjustDifficulty();
+				randomizeMiners();
 				sendTransactions();
 				firstMiner = executorServiceMiners.invokeAny(callableMiners); // Appelle la méthode call de tous les users. L'exécution reprend quand l'un d'eux à fini
 				Block newBlockOnTheBlock = firstMiner.getCurrentBlock();
 				exchangeMoney(newBlockOnTheBlock.getTransactions());
-				Chain.getInstance().getBlocks().add(firstMiner.getCurrentBlock());
-				minersEnCours.remove(firstMiner);
+				Chain.getInstance().getBlocks().add(firstMiner.getCurrentBlock());				
 			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
 			} 
@@ -138,15 +149,56 @@ public class Server implements Runnable{
 			blocNo++; // increments variable blocNo by one
 			
 		}
+		serverShutdown();		
 	}
 	
-	public static void adjustDifficulty() {
+	private void randomizeMiners() {
+		boolean changement = ThreadLocalRandom.current().nextBoolean();// TODO Auto-generated method stub
+		boolean addOrRemove = ThreadLocalRandom.current().nextBoolean();
 		
+		if(changement && addOrRemove && (callableMiners.size() + 1 <= MAX_MINERS )) {
+			Miner newMiner = new Miner("newKid "+blocNo,1);
+			Server.callableMiners.add(newMiner);
+	    	
+		}
+		else if (changement && !addOrRemove && (callableMiners.size() -1 >= MIN_MINERS)) {
+			Miner oldMiner = (Miner) callableMiners.get(0);
+			callableMiners.remove(0);
+			miners.remove(oldMiner.getPublicKey());
+		}
+	}
+
+	/*
+	 * Based on https://bitcoin.stackexchange.com/questions/5838/how-is-difficulty-calculated
+	 */
+	public static void adjustDifficulty() {
+		List<Block> blocks =  Chain.getInstance().getBlocks();
+		
+		
+		int lastIndex = blocks.size()-1;
+		int firstIndex = blocks.size()-(TARGET_NO_BLOCK);
+		System.out.println("last indeux: "+lastIndex);
+		System.out.println("first index: "+firstIndex);
+		
+		System.out.println("blocks size: "+blocks.size());
+		
+		Block last = blocks.get(lastIndex);
+		Block first = blocks.get(firstIndex);
+		
+		int elapsedSeconds = (int)(last.getTimestamp().getTime()-first.getTimestamp().getTime());
+		
+		double ratio = Math.round(elapsedSeconds / ESTIMATED_ELAPSED_TIME_BLOCK);
+		
+		ratio = ratio > MAX_INCREASE_COEF ? MAX_INCREASE_COEF : ratio;
+		ratio = ratio < MIN_DECREASE_COEF ? MIN_DECREASE_COEF : ratio;
+		System.out.println("old difficulty: "+Chain.DIFFICULTY);
+		Chain.DIFFICULTY *= ratio;
+		System.out.println("Difficulty is now: "+Chain.DIFFICULTY);
 	}
 
 
 	/*
-	 * Code to run when server shut down is called.
+	 * Code to run for a proper server shutdown
 	 */
 	public static void serverShutdown() {
 		TransactionGenerator.setIsRunning(false);

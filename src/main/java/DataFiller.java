@@ -43,8 +43,7 @@ public class DataFiller {
     	Server.callableMiners.add(miner2);
     	Server.callableMiners.add(miner3);
     	Server.callableMiners.add(miner4);
-    	Server.executorServiceMiners = Executors.newFixedThreadPool(Server.callableMiners.size()); // Pool d'users
-    	Server.minersEnCours = new ArrayList<Callable<Miner>>(Server.callableMiners);
+    	Server.executorServiceMiners = Executors.newCachedThreadPool();
     }
     
     public static void initCsv() {

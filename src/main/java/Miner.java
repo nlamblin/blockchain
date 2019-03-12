@@ -18,21 +18,29 @@ public class Miner extends User implements Callable{
     private GPU gpu;
     private ExecutorService executor;
     private List<Transaction> toExecute;
+    private int lag; // 
     
     public List<Transaction> getToExecute() {
 		return toExecute;
 	}
+    
+    public Miner(String name, float balance, int lag) {
+        super(name, balance);
+        this.lag = lag;
+        toExecute = new ArrayList<Transaction>();
+    }
 
 
 	public Miner(String name, float balance) {
         super(name, balance);
         toExecute = new ArrayList<Transaction>();
+        this.lag = 0;
 	}
 
 
     public void createBlock() {
         String previousBlockHash = (Chain.getInstance().getBlocks().isEmpty()) ? "####" : Chain.getInstance().getBlocks().get(Chain.getInstance().getBlocks().size() - 1).getHash();
-        this.currentBlock = new Block(previousBlockHash, this.name, new LinkedList<Transaction>(toExecute));
+        this.currentBlock = new Block(previousBlockHash, this.name, new LinkedList<Transaction>(toExecute),Chain.getInstance().DIFFICULTY);
     } 
     
     public Miner call() {
