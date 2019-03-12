@@ -7,8 +7,8 @@ public class Chain {
 
     private volatile static Chain chain = null; // volatile for thread safety
     private volatile ArrayList<Block> blocks;
-    public static int DIFFICULTY = 1;
-    public static final int BLOCK_SIZE = 4;
+    public static int DIFFICULTY = 5;
+    public static final int BLOCK_SIZE = 5;
     public static final double MIN_AMOUNT = 0.1;
     
     private Chain() {
@@ -32,12 +32,13 @@ public class Chain {
     }
     
     public String toString() {
-        String chainString = "";
+        StringBuilder sb = new StringBuilder("num;mined_in(total);mined_in(cpu);mined_by:difficulty\n");
+        int i = 0;
         for(Block block : blocks) {
-            chainString += "Block n°: " + blocks.indexOf(block) + "\n" +
-                    block.toString() + "\n\n";
+            sb.append(i+";"+block.getTimeToMine()+";"+block.getCpuTimeToMine()+";"+block.getParent()+";"+block.getDifficulty()+"\n");
+            i++;
         }
-        return chainString;
+        return sb.toString();
     }
 
     public static Chain getInstance() {

@@ -29,6 +29,8 @@ public class Server implements Runnable{
 	public static final int MIN_MINERS = 2;
 	public final static int MAX_INCREASE_COEF=4;
 	public final static double MIN_DECREASE_COEF=0.25;
+	public static int TRANSACTION_BY_BLOCK;
+	
 	
 	
     public static volatile Map<PublicKey, Trader> traders = new HashMap<>();
@@ -131,13 +133,15 @@ public class Server implements Runnable{
 				while (pool.size() < Chain.BLOCK_SIZE) 
 					Thread.yield();
 				if (blocNo % TARGET_NO_BLOCK == 0 && blocNo >= 10 ) // every TARGET_NO_BLOCK ew adjust difficulty
-					adjustDifficulty();
+					System.out.println();
+					//adjustDifficulty();
 				randomizeMiners();
 				sendTransactions();
 				firstMiner = executorServiceMiners.invokeAny(callableMiners); // Appelle la méthode call de tous les users. L'exécution reprend quand l'un d'eux à fini
 				Block newBlockOnTheBlock = firstMiner.getCurrentBlock();
+				System.out.println("size: "+Chain.getInstance().getBlocks().size()+" - "+"this bad boy was mined in "+newBlockOnTheBlock.getTimeToMine()+" (cpu: "+newBlockOnTheBlock.getCpuTimeToMine()+")");
 				exchangeMoney(newBlockOnTheBlock.getTransactions());
-				Chain.getInstance().getBlocks().add(firstMiner.getCurrentBlock());				
+				Chain.getInstance().getBlocks().add(newBlockOnTheBlock);				
 			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
 			} 
@@ -177,10 +181,6 @@ public class Server implements Runnable{
 		
 		int lastIndex = blocks.size()-1;
 		int firstIndex = blocks.size()-(TARGET_NO_BLOCK);
-		System.out.println("last indeux: "+lastIndex);
-		System.out.println("first index: "+firstIndex);
-		
-		System.out.println("blocks size: "+blocks.size());
 		
 		Block last = blocks.get(lastIndex);
 		Block first = blocks.get(firstIndex);
@@ -191,9 +191,7 @@ public class Server implements Runnable{
 		
 		ratio = ratio > MAX_INCREASE_COEF ? MAX_INCREASE_COEF : ratio;
 		ratio = ratio < MIN_DECREASE_COEF ? MIN_DECREASE_COEF : ratio;
-		System.out.println("old difficulty: "+Chain.DIFFICULTY);
 		Chain.DIFFICULTY *= ratio;
-		System.out.println("Difficulty is now: "+Chain.DIFFICULTY);
 	}
 
 

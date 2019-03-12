@@ -1,4 +1,3 @@
-
 import java.security.PublicKey;
 import java.security.Signature;
 import java.util.ArrayList;
@@ -26,13 +25,16 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
         Server s = new Server();
         Server.init();
-        DataFiller.fill();
+        DataFiller.fill(2);
         Thread main = new Thread(s);
         main.start();
         
-        Scanner sc = new Scanner(System.in);
-        sc.nextInt();
+        while (Chain.getInstance().getBlocks().size() < 10) {
+        	Thread.yield();
+        }
+                
         System.out.println("shutting down");
-        s.setRunning(false);
+        Server.setRunning(false);
+        
     }
 }

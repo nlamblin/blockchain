@@ -1,3 +1,5 @@
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 import java.sql.Timestamp;
 import java.util.Random;
 import java.util.concurrent.Callable;
@@ -7,7 +9,9 @@ import java.util.concurrent.Callable;
  */
 public class GPU implements Callable{
 	private Block currentBlock;
-	private volatile Miner parent;	
+	private volatile Miner parent;
+	ThreadMXBean bean = ManagementFactory.getThreadMXBean( );
+    
 	
 	public GPU(Block currentBlock, Miner parent) {
 		super();
@@ -43,11 +47,14 @@ public class GPU implements Callable{
 
 	@Override
 	public GPU call() {
-		final long startTime = System.currentTimeMillis();
+		long wallStartTime = System.currentTimeMillis();
+		long cpuStartTime = bean.getCurrentThreadCpuTime();
 		mine();
 		parent.setCurrentBlock(currentBlock);
-		final long endTime = System.currentTimeMillis();
-		currentBlock.setTimeToMine(endTime - startTime);
+		long cpuEndTime = bean.getCurrentThreadCpuTime();
+		long wallEndTime = System.currentTimeMillis();
+		currentBlock.setTimeToMine(wallEndTime - wallStartTime);
+		currentBlock.setCpuTimeToMine((cpuEndTime - cpuStartTime)/1000000);
 		return this;
 	}
 

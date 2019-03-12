@@ -8,10 +8,10 @@ import java.util.concurrent.Executors;
 
 public class DataFiller {
 	
-	public static void fill() {
+	public static void fill(int nbMiner) {
 		initCsv();
 		initTraders();
-		initMiners();
+		initMiners(nbMiner);
 	}
 	
 	public static void initTraders() {
@@ -33,16 +33,12 @@ public class DataFiller {
         t.start();
     }
     
-    public static void initMiners() {
-    	Miner miner = new Miner("miner", 1);
-        Miner miner2 = new Miner("miner2", 1);
-        Miner miner3 = new Miner("miner3", 1);
-        Miner miner4 = new Miner("miner4", 1);
+    public static void initMiners(int nb) {
     	Server.callableMiners = new ArrayList<>();
-    	Server.callableMiners.add(miner);
-    	Server.callableMiners.add(miner2);
-    	Server.callableMiners.add(miner3);
-    	Server.callableMiners.add(miner4);
+    	for (int i = 0 ; i < nb ; i ++) {
+    		Miner miner = new Miner("miner"+i, 1);
+    		Server.callableMiners.add(miner);
+    	}
     	Server.executorServiceMiners = Executors.newCachedThreadPool();
     }
     

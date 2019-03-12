@@ -13,7 +13,9 @@ public class Block {
     private long timeToMine;
     private String parent;
     private int difficulty;
-
+    private long cpuTimeToMine;
+    
+    
     public Block(String previousHash, String parent, List<Transaction> toExecute, int difficulty) {
     	this(previousHash, parent, toExecute);
     	this.difficulty=difficulty;
@@ -30,6 +32,7 @@ public class Block {
     	this.parent = b.parent; 
     	this.previousHash = b.previousHash;
     	this.transactions = b.transactions;
+    	this.difficulty = b.difficulty;
     }
     
     public Block(String previousHash) {
@@ -142,7 +145,15 @@ public class Block {
 	public int getDifficulty() {
 		return difficulty;
 	}
-    
-    
+
+	public long getCpuTimeToMine() {
+		return cpuTimeToMine;
+	}
+
+	public void setCpuTimeToMine(long cpuTimeToMine) {
+		this.cpuTimeToMine = cpuTimeToMine;
+	}
+	
+	
 
 }
