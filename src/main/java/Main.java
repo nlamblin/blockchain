@@ -29,7 +29,7 @@ public class Main {
         Thread main = new Thread(s);
         main.start();
         
-        while (Chain.getInstance().getBlocks().size() < 10) {
+        while (Chain.s) {
         	Thread.yield();
         }
                 

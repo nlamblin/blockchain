@@ -42,6 +42,9 @@ public class Server implements Runnable{
 	public static PrintWriter writer;
 	private int blocNo;
 	
+	public static ArrayList<PrintWriter> writers = new ArrayList<PrintWriter>();
+	
+	
     public static void init() {
     	Chain c = Chain.getInstance();
         isRunning = true;
@@ -132,8 +135,27 @@ public class Server implements Runnable{
 			try {
 				while (pool.size() < Chain.BLOCK_SIZE) 
 					Thread.yield();
-				if (blocNo % TARGET_NO_BLOCK == 0 && blocNo >= 10 ) // every TARGET_NO_BLOCK ew adjust difficulty
-					System.out.println();
+				if (blocNo == 10000) {
+					Chain.getInstance().getBlocks().clear();
+					Block dummy = new Block("f");
+					Chain.getInstance().getBlocks().add(dummy);
+					dummy.setHash("####");
+				}
+				if (blocNo % 100 == 0 && blocNo >= 10000 ){
+					Chain.DIFFICULTY+=1;
+					writers.get(0).write(Chain.getInstance().toString());
+					writers.get(0).close();
+					writers.remove(0);
+					
+					Chain.getInstance().getBlocks().clear();
+					Block dummy = new Block("f");
+					Chain.getInstance().getBlocks().add(dummy);
+					dummy.setHash("####");
+					
+					clearMiners();
+				}
+				if (blocNo % 10 == 0 && blocNo >= 10000 ) // every TARGET_NO_BLOCK ew adjust difficulty
+					addMiner(blocNo);
 					//adjustDifficulty();
 				randomizeMiners();
 				sendTransactions();
@@ -194,6 +216,15 @@ public class Server implements Runnable{
 		Chain.DIFFICULTY *= ratio;
 	}
 
+	public static void addMiner(int i) {
+		Miner m = new Miner("miner"+i,1);
+		Server.callableMiners.add(m);
+	}
+	
+	public static void clearMiners() {
+		Server.callableMiners.clear();
+		addMiner(0);
+	}
 
 	/*
 	 * Code to run for a proper server shutdown

@@ -44,6 +44,9 @@ public class DataFiller {
     
     public static void initCsv() {
     	try {
+    		for (int i = 0 ; i < 5 ; i++) {
+    			Server.writers.add(new PrintWriter(new File("src/main/resources/difficulty"+(i+3)+".csv")));
+    		}
     		LocalDateTime ldt = LocalDateTime.now();
     		int mo = ldt.getMonthValue();
     		int j = ldt.getDayOfMonth();
