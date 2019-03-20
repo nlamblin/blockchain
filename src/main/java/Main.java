@@ -31,12 +31,10 @@ public class Main {
         
         Scanner sc = new Scanner(System.in);
         int a = sc.nextInt();
-        /*while (Chain.getInstance().getBlocks().size() == 10) {
-        	Thread.yield();
-        }*/
-                
+        
         System.out.println("shutting down");
         Server.setRunning(false);
+        
         
     }
 }

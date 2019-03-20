@@ -68,12 +68,18 @@ public class Transaction {
         this.signature = signature;
     }
 
-    public String toString() {
+    public String detailledView() {
         return "\t\t Hash : " + this.hash + "\n" +
             "\t\t Amount : " + this.amount + "\n" +
             "\t\t Sender : " + Tools.getStringFromKey(this.senderKey) + "\n" +
             "\t\t Receiver : " + Tools.getStringFromKey(this.receiverKey) + "\n" +
             "\t\t Timestamp : " + this.timestamp + "\n" +
             "\t\t Validated : " + this.validationStatus + "\n";
+    }
+    
+    public String toString() {
+    return "\t\t Sender : " + Tools.getStringFromKey(this.senderKey) + "\n" +
+            "\t\t Receiver : " + Tools.getStringFromKey(this.receiverKey) + " for "+this.amount; 
+            	
     }
 }

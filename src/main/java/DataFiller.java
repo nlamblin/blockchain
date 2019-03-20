@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 
 public class DataFiller {
 	
+	
 	public static void fill(int nbMiner) {
 		initCsv();
 		initTraders();

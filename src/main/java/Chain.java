@@ -1,5 +1,9 @@
 import java.security.PublicKey;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
@@ -56,6 +60,33 @@ public class Chain {
         return this.blocks;
     }
 
+    public Transaction findTransaction (User sender,int y, int m, int d, int h, int min, int s) {
+    	LocalDateTime ld = LocalDateTime.of(y, m, d, h, min, s);
+    	Timestamp ts = Timestamp.valueOf(ld);
+    	for (Block b: Chain.getInstance().getBlocks()) {
+    		for (Transaction t : b.getTransactions()) {
+    			if ((Math.abs(t.getTimestamp().getTime()-ts.getTime())) <= 1000 
+    					&& sender.getPublicKey().equals(t.getSender()))
+    			{	
+    				System.out.println("hit!");
+    				return t;
+    			}
+    					
+    		}
+    	}
+    	return null;
+    }
+    
+    public List<Transaction> getHistory (User sender) {
+    	List<Transaction> res = new ArrayList<Transaction>();
+    	for (Block b: Chain.getInstance().getBlocks()) {
+    		for (Transaction t : b.getTransactions()) {
+    			if (t.getSender().equals(sender.getPublicKey()))
+    					res.add(t);
+    		}
+    	}
+    	return res;
+    }
 
     
 }
