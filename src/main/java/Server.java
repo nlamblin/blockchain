@@ -143,6 +143,7 @@ public class Server implements Runnable{
 				}
 				if (blocNo % 100 == 0 && blocNo >= 10000 ){
 					Chain.DIFFICULTY+=1;
+					System.out.println("DIFFICULTY IS NOW : "+Chain.DIFFICULTY);
 					writers.get(0).write(Chain.getInstance().toString());
 					writers.get(0).close();
 					writers.remove(0);
@@ -157,13 +158,16 @@ public class Server implements Runnable{
 				if (blocNo % 10 == 0 && blocNo >= 10000 ) // every TARGET_NO_BLOCK ew adjust difficulty
 					addMiner(blocNo);
 					//adjustDifficulty();
-				randomizeMiners();
-				sendTransactions();
-				firstMiner = executorServiceMiners.invokeAny(callableMiners); // Appelle la méthode call de tous les users. L'exécution reprend quand l'un d'eux à fini
-				Block newBlockOnTheBlock = firstMiner.getCurrentBlock();
-				System.out.println("size: "+Chain.getInstance().getBlocks().size()+" - "+"this bad boy was mined in "+newBlockOnTheBlock.getTimeToMine()+" (cpu: "+newBlockOnTheBlock.getCpuTimeToMine()+")");
-				exchangeMoney(newBlockOnTheBlock.getTransactions());
-				Chain.getInstance().getBlocks().add(newBlockOnTheBlock);				
+				if (blocNo >= 10000) {
+					randomizeMiners();
+					sendTransactions();
+					firstMiner = executorServiceMiners.invokeAny(callableMiners); // Appelle la méthode call de tous les users. L'exécution reprend quand l'un d'eux à fini
+					Block newBlockOnTheBlock = firstMiner.getCurrentBlock();
+					System.out.println("size: "+Chain.getInstance().getBlocks().size()+" - "+"this bad boy was mined in "+newBlockOnTheBlock.getTimeToMine()+" (cpu: "+newBlockOnTheBlock.getCpuTimeToMine()+")");
+					exchangeMoney(newBlockOnTheBlock.getTransactions());
+					Chain.getInstance().getBlocks().add(newBlockOnTheBlock);				
+				}
+				
 			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
 			} 
@@ -173,7 +177,6 @@ public class Server implements Runnable{
 				((Miner) u).getToExecute().clear();
 			}
 			blocNo++; // increments variable blocNo by one
-			
 		}
 		serverShutdown();		
 	}
@@ -217,11 +220,13 @@ public class Server implements Runnable{
 	}
 
 	public static void addMiner(int i) {
+		System.out.println("Nouveau mineur.");
 		Miner m = new Miner("miner"+i,1);
 		Server.callableMiners.add(m);
 	}
 	
 	public static void clearMiners() {
+		System.out.println("Suppression des mineurs.");
 		Server.callableMiners.clear();
 		addMiner(0);
 	}
@@ -231,8 +236,10 @@ public class Server implements Runnable{
 	 */
 	public static void serverShutdown() {
 		TransactionGenerator.setIsRunning(false);
-		if(Chain.isValid())
-            writer.write(Chain.getInstance().toString());
+		if(Chain.isValid()) {
+			System.out.println("fin");
+		}
+            //writer.write(Chain.getInstance().toString());
 	    else
 	        System.out.println("Chain is not valid !");
 		writer.close();

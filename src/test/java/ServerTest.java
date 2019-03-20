@@ -11,7 +11,7 @@ public class ServerTest {
 
 	@Test
 	public void TestBalanceUnaffectedBeforeMining() {
-	    DataFiller.initMiners();
+	    DataFiller.initMiners(5);
 	    Trader trader1 = new Trader("trader1", 50);
         Trader trader2 = new Trader("trader2", 60);
         trader1.sendMoney(trader2.getPublicKey(), 1);

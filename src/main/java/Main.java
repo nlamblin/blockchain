@@ -29,9 +29,11 @@ public class Main {
         Thread main = new Thread(s);
         main.start();
         
-        while (Chain.s) {
+        Scanner sc = new Scanner(System.in);
+        int a = sc.nextInt();
+        /*while (Chain.getInstance().getBlocks().size() == 10) {
         	Thread.yield();
-        }
+        }*/
                 
         System.out.println("shutting down");
         Server.setRunning(false);
