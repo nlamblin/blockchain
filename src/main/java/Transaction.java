@@ -1,5 +1,7 @@
 import java.security.PublicKey;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 public class Transaction {
 
@@ -78,8 +80,10 @@ public class Transaction {
     }
     
     public String toString() {
-    return "\t\t Sender : " + Tools.getStringFromKey(this.senderKey) + "\n" +
-            "\t\t Receiver : " + Tools.getStringFromKey(this.receiverKey) + " for "+this.amount; 
+    	NumberFormat formatter = new DecimalFormat("#0.00");     
+    return "\nSender : " + Server.traders.get(this.senderKey).getName() + " " +
+            "Receiver : " + Server.traders.get(this.receiverKey).getName() + " for "+formatter.format(this.amount)+
+            " at: "+getTimestamp();
             	
     }
 }

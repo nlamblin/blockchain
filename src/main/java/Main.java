@@ -27,14 +27,9 @@ public class Main {
         Server.init();
         DataFiller.fill(2);
         Thread main = new Thread(s);
+        IHM i = new IHM();
+        Thread tihm = new Thread(i);
+        tihm.start();
         main.start();
-        
-        Scanner sc = new Scanner(System.in);
-        int a = sc.nextInt();
-        
-        System.out.println("shutting down");
-        Server.setRunning(false);
-        
-        
     }
 }

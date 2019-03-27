@@ -140,7 +140,10 @@ public class Server implements Runnable{
 				sendTransactions();
 				firstMiner = executorServiceMiners.invokeAny(callableMiners); // Appelle la méthode call de tous les users. L'exécution reprend quand l'un d'eux à fini
 				Block newBlockOnTheBlock = firstMiner.getCurrentBlock();
-				System.out.println("size: "+Chain.getInstance().getBlocks().size()+" - "+"this bad boy was mined in "+newBlockOnTheBlock.getTimeToMine()+" (cpu: "+newBlockOnTheBlock.getCpuTimeToMine()+")");
+				/*
+				 * DEMO
+				 */
+				System.out.println("size: "+Chain.getInstance().getBlocks().size()+" - "+" minage terminé en: "+newBlockOnTheBlock.getTimeToMine()+" (cpu: "+newBlockOnTheBlock.getCpuTimeToMine()+")");
 				exchangeMoney(newBlockOnTheBlock.getTransactions());
 				Chain.getInstance().getBlocks().add(newBlockOnTheBlock);				
 			} catch (InterruptedException | ExecutionException e) {
@@ -211,8 +214,7 @@ public class Server implements Runnable{
 	public static void serverShutdown() {
 		TransactionGenerator.setIsRunning(false);
 		if(Chain.isValid()) {
-			System.out.println();
-			//System.out.println(Chain.getInstance().getBlocks());
+			System.out.println(Chain.getInstance().getBlocks());
 		}
             //writer.write(Chain.getInstance().toString());
 	    else

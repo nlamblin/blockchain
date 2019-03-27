@@ -8,7 +8,7 @@ public class TransactionGenerator implements Runnable{
 	private Trader sender,receiver;
 	public static final double MAX_PROPORTION = 0.15; //Max amount a trader will send 
 	public static final double MIN_PROPORTION = 0.05;
-	public static final int DELAY_BETWEEN_TRANSACTIONS = 4000; // Time in ms 
+	public static final int DELAY_BETWEEN_TRANSACTIONS = 500; // Time in ms 
 	private static boolean isRunning;
 	
 	public TransactionGenerator() {

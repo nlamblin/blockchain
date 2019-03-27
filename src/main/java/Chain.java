@@ -11,7 +11,7 @@ public class Chain {
 
     private volatile static Chain chain = null; // volatile for thread safety
     private volatile ArrayList<Block> blocks;
-    public static int DIFFICULTY = 3;
+    public static int DIFFICULTY = 6;
     public static final int BLOCK_SIZE = 5;
     public static final double MIN_AMOUNT = 0.1;
     
@@ -61,14 +61,15 @@ public class Chain {
     }
 
     public Transaction findTransaction (User sender,int y, int m, int d, int h, int min, int s) {
-    	LocalDateTime ld = LocalDateTime.of(y, m, d, h, min, s);
+    	LocalDateTime ld = LocalDateTime.of(y, m, d, h, min,s);
+    	
     	Timestamp ts = Timestamp.valueOf(ld);
+    	
     	for (Block b: Chain.getInstance().getBlocks()) {
     		for (Transaction t : b.getTransactions()) {
     			if ((Math.abs(t.getTimestamp().getTime()-ts.getTime())) <= 1000 
     					&& sender.getPublicKey().equals(t.getSender()))
     			{	
-    				System.out.println("hit!");
     				return t;
     			}
     					
@@ -77,7 +78,7 @@ public class Chain {
     	return null;
     }
     
-    public List<Transaction> getHistory (User sender) {
+    public List<Transaction> getHistorybySender (User sender) {
     	List<Transaction> res = new ArrayList<Transaction>();
     	for (Block b: Chain.getInstance().getBlocks()) {
     		for (Transaction t : b.getTransactions()) {
