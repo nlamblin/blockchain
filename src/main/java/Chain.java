@@ -11,7 +11,7 @@ public class Chain {
 
     private volatile static Chain chain = null; // volatile for thread safety
     private volatile ArrayList<Block> blocks;
-    public static int DIFFICULTY = 6;
+    public static int DIFFICULTY = 3;
     public static final int BLOCK_SIZE = 5;
     public static final double MIN_AMOUNT = 0.1;
     

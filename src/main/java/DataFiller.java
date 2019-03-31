@@ -54,7 +54,7 @@ public class DataFiller {
     		int h = ldt.getHour();
     		int m = ldt.getMinute();
     		int s = ldt.getSecond();
-			Server.writer = new PrintWriter(new File("src/main/resources/"+j+"-"+mo+" "+h+":"+m+":"+s+".csv"));
+			Server.writer = new PrintWriter(new File("src/main/resources/"+j+"-"+mo+"_"+h+"-"+m+"-"+s+".csv"));
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
